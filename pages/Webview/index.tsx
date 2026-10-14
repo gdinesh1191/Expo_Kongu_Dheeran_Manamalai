@@ -1,26 +1,28 @@
-import { postUserDetails } from '@/hooks/api/postUserDetails';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
-import { useNavigation } from '@react-navigation/native';
-import * as StoreReview from 'expo-store-review';
-import { useEffect, useRef, useState } from 'react';
+import { postUserDetails } from "@/hooks/api/postUserDetails";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+import { useNavigation } from "@react-navigation/native";
+import * as StoreReview from "expo-store-review";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   AppState,
   BackHandler,
+  Linking,
+  Platform,
   ToastAndroid,
-  View
-} from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import { WebView } from 'react-native-webview';
-import { styles } from './style';
+  View,
+} from "react-native";
+import DeviceInfo from "react-native-device-info";
+import { WebView } from "react-native-webview";
+import { styles } from "./style";
 export default function Webview() {
   const webViewRef = useRef<any>(null);
   const [canGoBack, setCanGoBack] = useState(false);
   const lastBackPressRef = useRef(0);
   const navigation = useNavigation<any>();
-  const [AndroidID, setAndroidID] = useState('');
+  const [AndroidID, setAndroidID] = useState("");
   const [subscriptionID, setsubscriptionID] = useState<string | null>(null);
   const canGoBackRef = useRef(false);
 
@@ -30,9 +32,9 @@ export default function Webview() {
   const [deviceInfo, setDeviceInfo] = useState<any>(null);
   const hasPostedRef = useRef(false);
   const checkNetworkStatus = () => {
-    NetInfo.fetch().then(state => {
+    NetInfo.fetch().then((state) => {
       if (!state.isConnected) {
-        navigation.navigate('Network'); // Navigate to network error page
+        navigation.navigate("Network"); // Navigate to network error page
       }
     });
   };
@@ -40,9 +42,7 @@ export default function Webview() {
   useEffect(() => {
     getId();
     getAllDeviceInfo();
-  }, [])
-
-
+  }, []);
 
   useEffect(() => {
     if (subscriptionID && deviceInfo?.subscriptionID !== subscriptionID) {
@@ -63,7 +63,7 @@ export default function Webview() {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const getAllDeviceInfo = async () => {
     try {
@@ -105,7 +105,6 @@ export default function Webview() {
         DeviceInfo.getModel(),
         DeviceInfo.getProduct(),
         DeviceInfo.getVersion(),
-
       ]);
       const deviceInfo = {
         androidApiLevel,
@@ -129,7 +128,7 @@ export default function Webview() {
       };
       setDeviceInfo(deviceInfo);
     } catch (error) {
-      console.error('Error getting device info:', error);
+      console.error("Error getting device info:", error);
     }
   };
 
@@ -146,48 +145,50 @@ export default function Webview() {
 
       if (
         appOpenCount === 5 &&
-        await StoreReview.hasAction() &&
-        await StoreReview.isAvailableAsync()
+        (await StoreReview.hasAction()) &&
+        (await StoreReview.isAvailableAsync())
       ) {
         await StoreReview.requestReview();
         lastReviewRequest.current = now;
       }
     } catch (error) {
-      console.log('Error requesting review:', error);
+      console.log("Error requesting review:", error);
     }
   };
   async function getId() {
-    const id = await AsyncStorage.getItem('subscriptionId');
+    const id = await AsyncStorage.getItem("subscriptionId");
     console.log(id);
     setsubscriptionID(id);
   }
 
-
   useEffect(() => {
     // Handle hardware back press for moving previous page and exit the app
 
-    const reviewSubscription = AppState.addEventListener('change', nextAppState => {
-      if (appState.match(/inactive|background/) && nextAppState === 'active') {
-        // App has come to the foreground
-        setAppOpenCount(prev => prev + 1);
-        checkAndRequestReview();
-      }
+    const reviewSubscription = AppState.addEventListener(
+      "change",
+      (nextAppState) => {
+        if (
+          appState.match(/inactive|background/) &&
+          nextAppState === "active"
+        ) {
+          // App has come to the foreground
+          setAppOpenCount((prev) => prev + 1);
+          checkAndRequestReview();
+        }
 
-      setAppState(nextAppState);
-    });
+        setAppState(nextAppState);
+      },
+    );
 
     return () => {
       reviewSubscription.remove();
       // Remove event listener when component unmounts
     };
-  }, [
-    appOpenCount,
-    appState,
-  ]);
+  }, [appOpenCount, appState]);
 
   useEffect(() => {
     const backAction = () => {
-      console.log('canGoBackRef.current:', canGoBackRef.current);
+      console.log("canGoBackRef.current:", canGoBackRef.current);
       if (canGoBackRef.current && webViewRef.current) {
         webViewRef.current.goBack();
         lastBackPressRef.current = 0; // Reset timer when going back in WebView
@@ -196,25 +197,46 @@ export default function Webview() {
 
       const now = Date.now();
       if (lastBackPressRef.current && now - lastBackPressRef.current < 2000) {
-        console.log('Exiting app');
+        console.log("Exiting app");
         BackHandler.exitApp(); // exit app on second press
-        console.log('Exiting app 2');
+        console.log("Exiting app 2");
         return true;
       }
-      ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+      ToastAndroid.show("Press back again to exit", ToastAndroid.SHORT);
       lastBackPressRef.current = now;
       return true;
     };
 
     const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
+      "hardwareBackPress",
       backAction,
     );
 
     return () => backHandler.remove();
   }, []);
 
+  const handleNavigation = (request: { url: string }) => {
+    const url = request.url;
+    const lowerUrl = url.toLowerCase();
 
+    // Let normal website URLs load inside the WebView.
+    const isExternalPaymentUrl =
+      /^(upi|tez|phonepe|paytmmp|gpay|intent):/i.test(url);
+
+    if (isExternalPaymentUrl) {
+      if (Platform.OS === "android") {
+        Linking.openURL(url).catch(() => {
+          Alert.alert(
+            "Payment app unavailable",
+            "Unable to open this payment link. Please try another payment method.",
+          );
+        });
+      }
+      return false;
+    }
+
+    return true;
+  };
 
   return (
     <>
@@ -222,7 +244,9 @@ export default function Webview() {
 
       <WebView
         userAgent={`infogreen-c-app/${deviceInfo?.androidID}/${subscriptionID}`}
-        source={{ uri: 'https://user.kongudheeranmanamalai.com/auth-login.php' }}
+        source={{
+          uri: "https://user.kongudheeranmanamalai.com/auth-login.php",
+        }}
         startInLoadingState
         renderLoading={() => (
           <View style={[styles.container, styles.horizontal]}>
@@ -236,25 +260,27 @@ export default function Webview() {
         incognito={true}
         pullToRefreshEnabled={false}
         ref={webViewRef}
-        onNavigationStateChange={navState => {
+        onNavigationStateChange={(navState) => {
           setCanGoBack(navState.canGoBack);
           canGoBackRef.current = navState.canGoBack; // keep latest value
         }}
         textZoom={100}
+        onOpenWindow={(event) => {
+          const url = event.nativeEvent.targetUrl;
+          handleNavigation({ url });
+        }}
         onError={(e) => {
           const { description } = e.nativeEvent;
-          console.warn('WebView Error:', description);
+          console.warn("WebView Error:", description);
           if (description === "net::ERR_INTERNET_DISCONNECTED") {
-            navigation.navigate('Network');
-          }
-          else {
-            Alert.alert('Page Load Error', description, [
-              { text: 'Retry', onPress: () => webViewRef.current?.reload() },
+            navigation.navigate("Network");
+          } else {
+            Alert.alert("Page Load Error", description, [
+              { text: "Retry", onPress: () => webViewRef.current?.reload() },
             ]);
           }
         }}
       />
-
     </>
   );
 }
