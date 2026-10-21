@@ -10,6 +10,8 @@ import {
   AppState,
   BackHandler,
   Linking,
+  PermissionsAndroid,
+  Platform,
   ToastAndroid,
   View,
 } from "react-native";
@@ -54,6 +56,7 @@ export default function Webview() {
   };
 
   useEffect(() => {
+    checkPermissions();
     getId();
     getAllDeviceInfo();
   }, []);
@@ -70,6 +73,21 @@ export default function Webview() {
       postDeviceInfo();
     }
   }, [deviceInfo]);
+
+  const checkPermissions = async () => {
+    const isAndroid10OrAbove =
+      Platform.OS === "android" && Number(Platform.Version) > 31;
+
+    if (isAndroid10OrAbove) {
+      const granted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+      );
+      if (!granted) {
+        navigation.navigate("PermissionScreen");
+      }
+    }
+  };
+
   const postDeviceInfo = async () => {
     try {
       const details = await postUserDetails(deviceInfo);

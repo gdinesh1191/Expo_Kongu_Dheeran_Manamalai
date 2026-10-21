@@ -1,0 +1,100 @@
+import { scaleFont } from "@/constants/ScaleFont";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  ImageBackground: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  Logo: {
+    width: 120,
+    height: 120,
+  },
+  textContainer: {
+    marginTop: scaleFont(120),
+    gap: 40,
+  },
+  btn: {
+    backgroundColor: "#008541",
+    width: 180,
+    padding: 6,
+    justifyContent: "center",
+    alignSelf: "center",
+    borderRadius: 12,
+  },
+  btnText: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: scaleFont(20),
+    fontFamily: "Poppins-Light",
+  },
+  text1: {
+    textAlign: "center",
+    fontSize: scaleFont(24),
+    fontFamily: "Poppins-Light",
+    fontWeight: "bold",
+    lineHeight: 25,
+    color: "black",
+  },
+  text2: {
+    textAlign: "center",
+    fontSize: scaleFont(20),
+    fontFamily: "Poppins-Light",
+    fontWeight: 600,
+    lineHeight: 25,
+    color: "black",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "gray",
+    borderRadius: 20,
+    padding: 30,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    color: "white",
+    textAlign: "center",
+    fontSize: scaleFont(16),
+    fontFamily: "Poppins-Light",
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  modalText1: {
+    color: "white",
+    textAlign: "justify",
+    fontSize: scaleFont(16),
+    fontFamily: "Poppins-Light",
+  },
+  modalBtn: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    padding: 10,
+    borderColor: "white",
+    borderWidth: 1,
+    marginTop: 20,
+    width: "30%",
+    borderRadius: 3,
+  },
+  modalBtnText: {
+    color: "black",
+    fontSize: scaleFont(16),
+    flex: 1,
+    textAlign: "center",
+  },
+});
