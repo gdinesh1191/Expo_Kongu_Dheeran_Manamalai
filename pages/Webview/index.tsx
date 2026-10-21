@@ -10,7 +10,6 @@ import {
   AppState,
   BackHandler,
   Linking,
-  Platform,
   ToastAndroid,
   View,
 } from "react-native";
@@ -86,6 +85,7 @@ export default function Webview() {
         modal,
         productName,
         applicationVersion,
+        userAgent,
       ] = await Promise.all([
         DeviceInfo.getApiLevel(),
         DeviceInfo.getAndroidId(),
@@ -105,6 +105,7 @@ export default function Webview() {
         DeviceInfo.getModel(),
         DeviceInfo.getProduct(),
         DeviceInfo.getVersion(),
+        DeviceInfo.getUserAgent(),
       ]);
       const deviceInfo = {
         androidApiLevel,
@@ -125,7 +126,9 @@ export default function Webview() {
         modal,
         productName,
         applicationVersion,
+        userAgent,
       };
+      console.log("deviceInfo", deviceInfo);
       setDeviceInfo(deviceInfo);
     } catch (error) {
       console.error("Error getting device info:", error);
@@ -215,23 +218,30 @@ export default function Webview() {
     return () => backHandler.remove();
   }, []);
 
+  const parseIntentUrl = (url: string) => {
+    // intent://pay?pa=...#Intent;scheme=upi;package=com.xxx;end
+    const m = url.match(/^intent:\/\/(.*?)#Intent;(.*)$/i);
+    if (!m) return null;
+    const scheme = /scheme=([^;]+)/.exec(m[2])?.[1] ?? "https";
+    return `${scheme}://${m[1]}`;
+  };
+
   const handleNavigation = (request: { url: string }) => {
-    const url = request.url;
-    const lowerUrl = url.toLowerCase();
+    const { url } = request;
 
-    // Let normal website URLs load inside the WebView.
-    const isExternalPaymentUrl =
-      /^(upi|tez|phonepe|paytmmp|gpay|intent):/i.test(url);
+    if (/^(upi|tez|phonepe|paytmmp|gpay|credpay|bhim|amazonpay):/i.test(url)) {
+      Linking.openURL(url).catch(() =>
+        Alert.alert(
+          "Payment app unavailable",
+          "Please try another payment method.",
+        ),
+      );
+      return false;
+    }
 
-    if (isExternalPaymentUrl) {
-      if (Platform.OS === "android") {
-        Linking.openURL(url).catch(() => {
-          Alert.alert(
-            "Payment app unavailable",
-            "Unable to open this payment link. Please try another payment method.",
-          );
-        });
-      }
+    if (/^intent:/i.test(url)) {
+      const target = parseIntentUrl(url);
+      if (target) Linking.openURL(target).catch(() => {});
       return false;
     }
 
@@ -243,7 +253,7 @@ export default function Webview() {
       {/* here i am checking the user status for getting the link from api if user status is pending the api doesn't provide the link that case it navigate to bending screen once the status is success it will provid the link and user navigate to webview  */}
 
       <WebView
-        userAgent={`infogreen-c-app/${deviceInfo?.androidID}/${subscriptionID}`}
+        userAgent={`${deviceInfo?.userAgent} infogreen-c-app/${deviceInfo?.androidID}/${subscriptionID}`}
         source={{
           uri: "https://user.kongudheeranmanamalai.com/auth-login.php",
         }}
@@ -265,10 +275,8 @@ export default function Webview() {
           canGoBackRef.current = navState.canGoBack; // keep latest value
         }}
         textZoom={100}
-        onOpenWindow={(event) => {
-          const url = event.nativeEvent.targetUrl;
-          handleNavigation({ url });
-        }}
+        onShouldStartLoadWithRequest={handleNavigation}
+        originWhitelist={["*"]}
         onError={(e) => {
           const { description } = e.nativeEvent;
           console.warn("WebView Error:", description);
