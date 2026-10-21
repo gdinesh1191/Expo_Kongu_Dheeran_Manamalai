@@ -16,6 +16,20 @@ import {
 import DeviceInfo from "react-native-device-info";
 import { WebView } from "react-native-webview";
 import { styles } from "./style";
+// Razorpay Checkout detects Android WebView from the user agent
+// ("; wv)" token and "Version/4.0") and hides UPI apps/intent in that case.
+// Present the WebView as a regular Chrome browser so UPI options are shown.
+const browserLikeUserAgent = (ua?: string) => {
+  console.log("ua", ua);
+  const fallback =
+    "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+  if (!ua) return fallback;
+  return ua
+    .replace("; wv)", ")")
+    .replace(/\s?Version\/\d+\.\d+/i, "")
+    .trim();
+};
+
 export default function Webview() {
   const webViewRef = useRef<any>(null);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -29,6 +43,7 @@ export default function Webview() {
   const lastReviewRequest = useRef<number>(0);
   const [appState, setAppState] = useState(AppState.currentState);
   const [deviceInfo, setDeviceInfo] = useState<any>(null);
+  const [browserUserAgent, setBrowserUserAgent] = useState<string | null>(null);
   const hasPostedRef = useRef(false);
   const checkNetworkStatus = () => {
     NetInfo.fetch().then((state) => {
@@ -130,6 +145,8 @@ export default function Webview() {
       };
       console.log("deviceInfo", deviceInfo);
       setDeviceInfo(deviceInfo);
+      // build the browser-like user agent once, as soon as device info is loaded
+      setBrowserUserAgent(browserLikeUserAgent(deviceInfo.userAgent));
     } catch (error) {
       console.error("Error getting device info:", error);
     }
@@ -248,12 +265,25 @@ export default function Webview() {
     return true;
   };
 
+  // wait until device info is ready so the WebView loads with the final UA
+  if (!deviceInfo || !browserUserAgent) {
+    return (
+      <View style={[styles.container, styles.horizontal]}>
+        <ActivityIndicator size="large" color="#00ff00" />
+      </View>
+    );
+  }
+
+  // Razorpay decides from the HTTP User-Agent header, so the browser-like
+  // value must be part of the WebView userAgent.
+  const userAgent = `${deviceInfo?.applicationBuildVersion}/infogreen-c-app/${deviceInfo?.androidID}/${subscriptionID}/${browserUserAgent}`;
+
   return (
     <>
       {/* here i am checking the user status for getting the link from api if user status is pending the api doesn't provide the link that case it navigate to bending screen once the status is success it will provid the link and user navigate to webview  */}
 
       <WebView
-        userAgent={`${deviceInfo?.userAgent} infogreen-c-app/${deviceInfo?.androidID}/${subscriptionID}`}
+        userAgent={userAgent}
         source={{
           uri: "https://user.kongudheeranmanamalai.com/auth-login.php",
         }}
@@ -267,8 +297,9 @@ export default function Webview() {
         javaScriptEnabled={true}
         domStorageEnabled={true}
         cacheEnabled={false}
-        incognito={true}
+        incognito={false}
         pullToRefreshEnabled={false}
+        showsVerticalScrollIndicator={false}
         ref={webViewRef}
         onNavigationStateChange={(navState) => {
           setCanGoBack(navState.canGoBack);
