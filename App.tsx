@@ -10,10 +10,12 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
 import { Text, TextInput, useColorScheme, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { LogLevel, OneSignal } from "react-native-onesignal";
 import "react-native-reanimated";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import MainNavigator from "./app/MainNavigator";
+import { LikedProfilesProvider } from "./context/LikedProfilesContext";
 
 // You can remove this if you don't need to wait for any assets
 // SplashScreen.preventAutoHideAsync();
@@ -30,9 +32,11 @@ if ((TextInput as any).defaultProps == null) (TextInput as any).defaultProps = {
 export default function RootLayout() {
 
   return (
-        <SafeAreaProvider>
-          <Root />
-        </SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <SafeAreaProvider>
+            <Root />
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
     
   );
 }
@@ -93,11 +97,13 @@ function Root() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <View style={{ flex: 1 }}>
-        <View style={{  backgroundColor: '#009333', height:insets.top }} />
+        <View style={{  backgroundColor: '#0B9A0B', height:insets.top }} />
         <StatusBar style="light" />
-        <NavigationContainer>
-          <MainNavigator />
-        </NavigationContainer>
+        <LikedProfilesProvider>
+          <NavigationContainer>
+            <MainNavigator />
+          </NavigationContainer>
+        </LikedProfilesProvider>
         <View style={{height:insets.bottom }} />
       </View>
     </ThemeProvider>
