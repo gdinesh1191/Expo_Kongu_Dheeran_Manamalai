@@ -1,16 +1,14 @@
-import { FeedPost } from "@/constants/FeedPosts";
+import { FEED_ADMIN, FeedPost } from "@/constants/FeedPosts";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
-import { Image, Pressable, Share, Text, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { COLORS, styles } from "./style";
 
 type Props = {
   post: FeedPost;
-  liked: boolean;
-  active: boolean;
-  onLike: (id: string, liked: boolean) => void;
-  onOpenAuthor: (post: FeedPost) => void;
+  playing: boolean;
+  onTogglePlay: (id: string) => void;
 };
 
 function videoHtml(uri: string) {
@@ -35,17 +33,36 @@ function videoHtml(uri: string) {
 </html>`;
 }
 
-function FeedVideo({ uri, onPress }: { uri: string; onPress: () => void }) {
+function FeedVideo({
+  uri,
+  playing,
+  onToggle,
+}: {
+  uri: string;
+  playing: boolean;
+  onToggle: () => void;
+}) {
   const webRef = useRef<WebView>(null);
   const [muted, setMuted] = useState(true);
 
   useEffect(() => {
+    if (!playing) return;
     webRef.current?.injectJavaScript(`
       var clip = document.getElementById("clip");
       if (clip) { clip.muted = ${muted}; clip.play(); }
       true;
     `);
-  }, [muted]);
+  }, [muted, playing]);
+
+  if (!playing) {
+    return (
+      <Pressable style={styles.videoIdle} onPress={onToggle}>
+        <View style={styles.playCircle}>
+          <Ionicons name="play" size={22} color={COLORS.white} style={styles.playIcon} />
+        </View>
+      </Pressable>
+    );
+  }
 
   return (
     <>
@@ -64,7 +81,7 @@ function FeedVideo({ uri, onPress }: { uri: string; onPress: () => void }) {
         androidLayerType="hardware"
         pointerEvents="none"
       />
-      <Pressable style={styles.mediaFill} onPress={onPress} />
+      <Pressable style={styles.mediaFill} onPress={onToggle} />
       <TouchableOpacity style={styles.muteBtn} onPress={() => setMuted((value) => !value)}>
         <Ionicons name={muted ? "volume-mute" : "volume-high"} size={16} color={COLORS.white} />
       </TouchableOpacity>
@@ -72,95 +89,34 @@ function FeedVideo({ uri, onPress }: { uri: string; onPress: () => void }) {
   );
 }
 
-export default function FeedPostCard({ post, liked, active, onLike, onOpenAuthor }: Props) {
-  const [burst, setBurst] = useState(false);
-  const lastTap = useRef(0);
-  const burstTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const likes = post.likes + (liked ? 1 : 0);
-
-  useEffect(() => {
-    return () => {
-      if (burstTimer.current) clearTimeout(burstTimer.current);
-    };
-  }, []);
-
-  function showBurst() {
-    setBurst(true);
-    if (burstTimer.current) clearTimeout(burstTimer.current);
-    burstTimer.current = setTimeout(() => setBurst(false), 700);
-  }
-
-  function onMediaTap() {
-    const now = Date.now();
-    if (now - lastTap.current < 280) {
-      if (!liked) onLike(post.id, true);
-      showBurst();
-    }
-    lastTap.current = now;
-  }
-
+export default function FeedPostCard({ post, playing, onTogglePlay }: Props) {
   return (
     <View style={styles.post}>
-      <TouchableOpacity style={styles.postHead} activeOpacity={0.8} onPress={() => onOpenAuthor(post)}>
-        <View style={styles.postAvatar}>
-          <Image source={post.authorPhoto} style={styles.postAvatarImage} />
-        </View>
-        <View style={{ flex: 1 }}>
+      <Image source={FEED_ADMIN.photo} style={styles.postAvatar} resizeMode="contain" />
+      <View style={styles.tweetBody}>
+        <View style={styles.tweetNameRow}>
           <Text style={styles.postName} numberOfLines={1}>
-            {post.authorName}
+            {FEED_ADMIN.name}
           </Text>
-          <Text style={styles.postPlace} numberOfLines={1}>
-            {post.location}
-          </Text>
+          <Ionicons name="checkmark-circle" size={15} color={COLORS.primary} />
         </View>
-      </TouchableOpacity>
+        <Text style={styles.tweetMeta} numberOfLines={1}>
+          @{FEED_ADMIN.handle} · {post.timeAgo}
+        </Text>
+        <Text style={styles.tweetText}>{post.text}</Text>
 
-      <View style={styles.media}>
-        {post.media.type === "image" ? (
-          <Image source={post.media.source} style={styles.mediaFill} resizeMode="cover" />
-        ) : active ? (
-          <FeedVideo uri={post.media.uri} onPress={onMediaTap} />
-        ) : (
-          <View style={styles.videoPlaceholder}>
-            <Ionicons name="play-circle" size={54} color={COLORS.white} />
-            <Text style={styles.videoLabel}>Video</Text>
-          </View>
-        )}
-        {post.media.type === "image" || !active ? (
-          <Pressable style={styles.mediaFill} onPress={onMediaTap} />
-        ) : null}
-        {burst && (
-          <View style={styles.burst} pointerEvents="none">
-            <Ionicons name="heart" size={92} color={COLORS.white} />
-          </View>
-        )}
+        <View style={styles.tweetMedia}>
+          {post.media.type === "image" ? (
+            <Image source={post.media.source} style={styles.mediaFill} resizeMode="cover" />
+          ) : (
+            <FeedVideo
+              uri={post.media.uri}
+              playing={playing}
+              onToggle={() => onTogglePlay(post.id)}
+            />
+          )}
+        </View>
       </View>
-
-      <View style={styles.postActions}>
-        <TouchableOpacity onPress={() => onLike(post.id, !liked)} hitSlop={8}>
-          <Ionicons name={liked ? "heart" : "heart-outline"} size={26} color={liked ? COLORS.red : COLORS.text} />
-        </TouchableOpacity>
-        <TouchableOpacity hitSlop={8}>
-          <Ionicons name="chatbubble-outline" size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          hitSlop={8}
-          onPress={() => Share.share({ message: `${post.authorName}: ${post.caption}` })}
-        >
-          <Ionicons name="paper-plane-outline" size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <View style={styles.postActionSpacer} />
-      </View>
-
-      <Text style={styles.postLikes}>{likes.toLocaleString()} likes</Text>
-      <Text style={styles.postCaption}>
-        <Text style={styles.postCaptionName}>{post.authorName} </Text>
-        {post.caption}
-      </Text>
-      {post.comments > 0 && (
-        <Text style={styles.postComments}>View all {post.comments} comments</Text>
-      )}
-      <Text style={styles.postTime}>{post.timeAgo}</Text>
     </View>
   );
 }

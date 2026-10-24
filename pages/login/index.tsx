@@ -19,13 +19,16 @@ import RemixIcon from "react-native-remix-icon";
 // TODO: put your own images at these paths (or change the paths)
 // - bg-login.png : dark green background with temple, warrior and leaf art (full screen)
 // - logo.png     : the round "K" logo
-const BG = require("../../assets/Images/bg-login.png");
+const BG = require("../../assets/Images/login_bg.png");
 const LOGO = require("../../assets/Images/Logo_bg.png");
 
 const COLORS = {
   bg: "#0B3B1E",
   overlay: "rgba(5, 40, 18, 0.55)",
   gold: "#B79B5B",
+  tabGold: "#C9A24B",
+  tabText: "#0B2A14",
+  cream: "#F5F0E6",
   field: "#F6F2EA",
   fieldText: "#6B7280",
   icon: "#374151",
@@ -36,16 +39,19 @@ const COLORS = {
   secure: "#8FD0A6",
 };
 
+type LoginRole = "user" | "staff";
+
 export default function LoginPage() {
   const navigation = useNavigation<any>();
+  const [role, setRole] = useState<LoginRole>("user");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
 
   const onLogin = () => {
-    // TODO: call your login API with { username, password, remember }
-    navigation.navigate("SendOtp")
+    // TODO: call your login API with { username, password, remember, role }
+    navigation.navigate("SendOtp", { role });
   };
 
   return (
@@ -82,6 +88,41 @@ export default function LoginPage() {
             </View>
 
             <Text style={styles.subtitle}>Sign in to continue</Text>
+
+            <View style={styles.roleRow}>
+              <Pressable
+                style={[styles.roleOption, role === "user" && styles.roleOptionOn]}
+                onPress={() => setRole("user")}
+              >
+                <RemixIcon
+                  name="user-3-line"
+                  size={18}
+                  color={role === "user" ? COLORS.tabText : COLORS.cream}
+                />
+                <Text
+                  style={[styles.roleText, role === "user" && styles.roleTextOn]}
+                  numberOfLines={1}
+                >
+                  User Login
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.roleOption, role === "staff" && styles.roleOptionOn]}
+                onPress={() => setRole("staff")}
+              >
+                <RemixIcon
+                  name="shield-user-line"
+                  size={18}
+                  color={role === "staff" ? COLORS.tabText : COLORS.cream}
+                />
+                <Text
+                  style={[styles.roleText, role === "staff" && styles.roleTextOn]}
+                  numberOfLines={1}
+                >
+                  Staff Login
+                </Text>
+              </Pressable>
+            </View>
 
             {/* Username */}
             <View style={styles.field}>
@@ -222,7 +263,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     marginTop: 8,
+    marginBottom: 16,
+  },
+
+  roleRow: {
+    flexDirection: "row",
+    gap: 12,
     marginBottom: 20,
+  },
+  roleOption: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    height: 46,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.45)",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    paddingHorizontal: 8,
+  },
+  roleOptionOn: {
+    backgroundColor: COLORS.tabGold,
+    borderColor: COLORS.tabGold,
+  },
+  roleText: {
+    color: COLORS.cream,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  roleTextOn: {
+    color: COLORS.tabText,
   },
 
   field: {

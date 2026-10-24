@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 
-const BG = require("../assets/Images/bg-login.png");
+const BG = require("../assets/Images/login_bg.png");
 const LOGO = require("../assets/Images/Logo_bg.png");
 
 const COLORS = {

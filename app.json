@@ -40,7 +40,8 @@
         {
           "mode": "production"
         }
-      ]
+      ],
+      "expo-maps"
     ],
     "experiments": {
       "typedRoutes": true,

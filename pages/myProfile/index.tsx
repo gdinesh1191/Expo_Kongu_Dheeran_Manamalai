@@ -1,7 +1,7 @@
 import BottomTabBar from "@/components/BottomTabBar";
+import FillImage from "@/components/FillImage";
 import { MY_PROFILE } from "@/constants/SampleProfile";
 import { clean, nameWithAge } from "@/utils/profile";
-import FillImage from "@/components/FillImage";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -45,6 +45,9 @@ export default function MyProfile() {
       icon: "download",
       onPress: () => navigation.navigate("DownlodProfile", { profile }),
     },
+    { key: "attendance", label: "Attendance", icon: "calendar", onPress: () => navigation.navigate("Attendance") },
+    { key: "chat", label: "Chat", icon: "message-circle", onPress: () => navigation.navigate("Chat") },
+    { key: "todo", label: "To-do", icon: "check-square", onPress: () => navigation.navigate("Todo") },
     { key: "logout", label: "Log out", icon: "log-out", danger: true, onPress: confirmLogout },
   ];
 
@@ -131,7 +134,7 @@ export default function MyProfile() {
         </View>
       </ScrollView>
 
-      <BottomTabBar active="Profile" />
+      <BottomTabBar active="My Profile" />
     </View>
   );
 }

@@ -8,9 +8,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
-import SwipeCard, { SwipeDirection } from "../Home/SwipeCard";
-import SwipeGuideModal from "../Home/SwipeGuideModal";
 import { COLORS, styles } from "../Home/style";
+import SwipeCard, { SwipeDirection } from "./SwipeCard";
+import SwipeGuideModal from "./SwipeGuideModal";
 
 const SWIPE_GUIDE_SEEN_KEY = "home_swipe_guide_seen";
 
@@ -160,7 +160,7 @@ export default function Search() {
         ) : null}
       </View>
 
-      <BottomTabBar active="Search" />
+      <BottomTabBar active="Profiles" />
 
       <SwipeGuideModal visible={showGuide} onClose={closeGuide} />
     </View>

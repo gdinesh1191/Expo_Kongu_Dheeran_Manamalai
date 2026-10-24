@@ -1,5 +1,5 @@
 import OtpScreenShell from "@/components/OtpScreenShell";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
 import {
   Pressable,
@@ -19,12 +19,15 @@ type Channel = "email" | "phone";
 
 export default function SendOtpPage() {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+  const role = route.params?.role ?? "user";
   const [channel, setChannel] = useState<Channel>("phone");
 
   const onSend = () => {
     navigation.navigate("VerifyOtp", {
       channel,
       masked: CONTACTS[channel],
+      role,
     });
   };
 

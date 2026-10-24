@@ -1,8 +1,8 @@
 import BottomTabBar from "@/components/BottomTabBar";
+import FillImage from "@/components/FillImage";
 import { Profile } from "@/constants/SampleProfile";
 import { useLikedProfiles } from "@/context/LikedProfilesContext";
 import { nameWithAge } from "@/utils/profile";
-import FillImage from "@/components/FillImage";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -79,7 +79,7 @@ export default function LikedProfiles() {
         />
       )}
 
-      <BottomTabBar active="Interests" />
+      <BottomTabBar active="Wish List" />
     </View>
   );
 }

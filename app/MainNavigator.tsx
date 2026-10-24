@@ -1,4 +1,6 @@
 
+import Attendance from "@/pages/attendance";
+import Chat from "@/pages/chat";
 import DownlodProfile from "@/pages/DownlodProfile";
 import Home from "@/pages/Home";
 import LikedProfiles from "@/pages/LikedProfiles";
@@ -9,6 +11,7 @@ import PermissionScreen from "@/pages/PermissionScreen";
 import ProfileDetails from "@/pages/ProfileDetails";
 import Search from "@/pages/search";
 import SendOtpPage from "@/pages/sendOtp";
+import TodoPage from "@/pages/todo";
 import VerificationScreen from "@/pages/VerificationScreen";
 import VerifyOtpPage from "@/pages/verifyOtp";
 import Webview from "@/pages/Webview";
@@ -34,6 +37,9 @@ export default function MainNavigator() {
         <MainStack.Screen name="Login" component={LoginPage} />
         <MainStack.Screen name="SendOtp" component={SendOtpPage} />
         <MainStack.Screen name="VerifyOtp" component={VerifyOtpPage} />
+        <MainStack.Screen name="Todo" component={TodoPage} />
+        <MainStack.Screen name="Attendance" component={Attendance} />
+        <MainStack.Screen name="Chat" component={Chat} />
       </MainStack.Navigator>
   )
 }

@@ -15,7 +15,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { COLORS, styles } from "./style";
+import { COLORS, styles } from "../Home/style";
 
 export type SwipeDirection = "next" | "previous" | "up";
 type FeatherIcon = React.ComponentProps<typeof Feather>["name"];

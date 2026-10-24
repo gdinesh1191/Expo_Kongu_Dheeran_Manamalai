@@ -7,9 +7,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const TABS = [
   { key: "Home", icon: "home", route: "Home" },
-  { key: "Search", icon: "search", route: "Search" },
-  { key: "Interests", icon: "heart", route: "LikedProfiles" },
-  { key: "Profile", icon: "user", route: "MyProfile" },
+  { key: "Profiles", icon: "users", route: "Search" },
+  { key: "Wish List", icon: "heart", route: "LikedProfiles" },
+  { key: "My Profile", icon: "user", route: "MyProfile" },
 ] as const;
 
 export type TabKey = (typeof TABS)[number]["key"];
@@ -29,7 +29,9 @@ export default function BottomTabBar({ active }: { active: TabKey }) {
               if (!isActive && tab.route) navigation.navigate(tab.route);
             }}
           >
-            <Feather name={tab.icon} size={22} color={isActive ? COLORS.primary : COLORS.muted} />
+            <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
+              <Feather name={tab.icon} size={20} color={isActive ? COLORS.primary : COLORS.muted} />
+            </View>
             <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{tab.key}</Text>
           </TouchableOpacity>
         );
@@ -50,7 +52,17 @@ const styles = StyleSheet.create({
   tabItem: {
     flex: 1,
     alignItems: "center",
-    gap: scaleFont(4),
+    gap: scaleFont(2),
+  },
+  iconWrap: {
+    width: scaleFont(36),
+    height: scaleFont(36),
+    borderRadius: scaleFont(18),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconWrapActive: {
+    backgroundColor: COLORS.primaryLight,
   },
   tabLabel: {
     fontSize: scaleFont(11),

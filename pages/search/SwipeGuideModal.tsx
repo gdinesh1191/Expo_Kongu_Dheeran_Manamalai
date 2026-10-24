@@ -11,7 +11,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { COLORS } from "./style";
+import { COLORS } from "../Home/style";
 
 const STEPS = [
   {
