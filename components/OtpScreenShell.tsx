@@ -2,14 +2,13 @@ import { ReactNode } from "react";
 import {
   Image,
   ImageBackground,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import KeyboardAwareScrollView from "./KeyboardAwareScrollView";
 
 const BG = require("../assets/Images/login_bg.png");
 const LOGO = require("../assets/Images/Logo_bg.png");
@@ -31,23 +30,18 @@ export default function OtpScreenShell({ children }: Props) {
       <StatusBar backgroundColor="#0B8A3A" barStyle="light-content" />
       <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
         <View style={styles.overlay} />
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        <KeyboardAwareScrollView
+          extraScrollHeight={180}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scroll}
         >
-          <ScrollView
-            contentContainerStyle={styles.scroll}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.card}>
-              <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-              <Text style={styles.title}>Kongu Dheeran Manamalai</Text>
-              {children}
-              <Text style={styles.footer}>© 2026 Kongu Dheeran Manamalai .</Text>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
+          <View style={styles.card}>
+            <Image source={LOGO} style={styles.logo} resizeMode="contain" />
+            <Text style={styles.title}>Kongu Dheeran Manamalai</Text>
+            {children}
+            <Text style={styles.footer}>© 2026 Kongu Dheeran Manamalai .</Text>
+          </View>
+        </KeyboardAwareScrollView>
       </ImageBackground>
     </View>
   );

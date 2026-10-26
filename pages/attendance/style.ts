@@ -96,7 +96,7 @@ export const styles = StyleSheet.create({
   tabs: {
     flexDirection: "row",
     marginHorizontal: scaleFont(14),
-    marginTop: scaleFont(14),
+    marginTop: scaleFont(8),
     padding: scaleFont(4),
     borderRadius: scaleFont(12),
     backgroundColor: COLORS.white,
@@ -136,7 +136,6 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.amberBorder,
   },
- 
 
   // Employee + month row
   headingRow: {

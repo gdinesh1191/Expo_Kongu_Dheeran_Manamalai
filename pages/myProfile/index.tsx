@@ -1,7 +1,7 @@
 import BottomTabBar from "@/components/BottomTabBar";
 import FillImage from "@/components/FillImage";
 import { MY_PROFILE } from "@/constants/SampleProfile";
-import { clean, nameWithAge } from "@/utils/profile";
+import { clean, nameWithAge, primaryPhoto } from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -24,7 +24,11 @@ export default function MyProfile() {
   const stats = [
     { label: "Sent", value: profile.stats.sent, color: COLORS.primary },
     { label: "Received", value: profile.stats.received, color: COLORS.red },
-    { label: "Shortlisted", value: profile.stats.shortlisted, color: COLORS.primary },
+    {
+      label: "Shortlisted",
+      value: profile.stats.shortlisted,
+      color: COLORS.primary,
+    },
   ];
 
   function confirmLogout() {
@@ -36,7 +40,12 @@ export default function MyProfile() {
 
   const menu: MenuItem[] = [
     { key: "edit", label: "Edit profile", icon: "edit-2" },
-    { key: "preferences", label: "Partner preferences", icon: "heart", danger: true },
+    {
+      key: "preferences",
+      label: "Partner preferences",
+      icon: "heart",
+      danger: true,
+    },
     { key: "verification", label: "Verification", icon: "shield" },
     { key: "privacy", label: "Privacy and security", icon: "lock" },
     {
@@ -45,15 +54,22 @@ export default function MyProfile() {
       icon: "download",
       onPress: () => navigation.navigate("DownlodProfile", { profile }),
     },
-    { key: "attendance", label: "Attendance", icon: "calendar", onPress: () => navigation.navigate("Attendance") },
-    { key: "chat", label: "Chat", icon: "message-circle", onPress: () => navigation.navigate("Chat") },
-    { key: "todo", label: "To-do", icon: "check-square", onPress: () => navigation.navigate("Todo") },
-    { key: "logout", label: "Log out", icon: "log-out", danger: true, onPress: confirmLogout },
+
+    {
+      key: "logout",
+      label: "Log out",
+      icon: "log-out",
+      danger: true,
+      onPress: confirmLogout,
+    },
   ];
 
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         <View style={styles.headerCurve} />
 
         {/* Header */}
@@ -69,7 +85,7 @@ export default function MyProfile() {
           <View style={styles.avatar}>
             <View style={styles.avatarHead} />
             <View style={styles.avatarBody} />
-            <FillImage source={profile.photo} />
+            <FillImage source={primaryPhoto(profile)} />
           </View>
           <TouchableOpacity style={styles.editBadge}>
             <Feather name="edit-2" size={13} color={COLORS.white} />
@@ -80,14 +96,18 @@ export default function MyProfile() {
           <Text style={styles.name}>{nameWithAge(profile)}</Text>
         </View>
         <Text style={styles.meta}>
-          {[clean(profile.WorkingCategory), clean(profile.location)].filter(Boolean).join(" · ")}
+          {[clean(profile.WorkingCategory), clean(profile.location)]
+            .filter(Boolean)
+            .join(" · ")}
         </Text>
 
         {/* Stats */}
         <View style={styles.statsRow}>
           {stats.map((item) => (
             <View key={item.label} style={styles.statCard}>
-              <Text style={[styles.statValue, { color: item.color }]}>{item.value}</Text>
+              <Text style={[styles.statValue, { color: item.color }]}>
+                {item.value}
+              </Text>
               <Text style={styles.statLabel}>{item.label}</Text>
             </View>
           ))}
@@ -100,7 +120,12 @@ export default function MyProfile() {
             <Text style={styles.completeValue}>{profile.completeness}%</Text>
           </View>
           <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${profile.completeness}%` }]} />
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${profile.completeness}%` },
+              ]}
+            />
           </View>
           <Text style={styles.completeHint}>{profile.completenessHint}</Text>
         </View>
@@ -113,14 +138,21 @@ export default function MyProfile() {
               style={[styles.menuItem, index > 0 && styles.menuDivider]}
               onPress={item.onPress}
             >
-              <View style={[styles.menuIcon, item.danger && styles.menuIconDanger]}>
+              <View
+                style={[styles.menuIcon, item.danger && styles.menuIconDanger]}
+              >
                 <Feather
                   name={item.icon}
                   size={18}
                   color={item.danger ? COLORS.red : COLORS.primary}
                 />
               </View>
-              <Text style={[styles.menuLabel, item.key === "logout" && styles.menuLabelDanger]}>
+              <Text
+                style={[
+                  styles.menuLabel,
+                  item.key === "logout" && styles.menuLabelDanger,
+                ]}
+              >
                 {item.label}
               </Text>
               {item.badge && (

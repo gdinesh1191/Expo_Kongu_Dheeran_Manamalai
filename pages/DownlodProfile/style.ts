@@ -17,7 +17,6 @@ export const styles = StyleSheet.create({
   hero: {
     height: HERO_HEIGHT,
     backgroundColor: COLORS.primary,
-    overflow: "hidden",
   },
   avatarWrap: {
     ...StyleSheet.absoluteFillObject,
@@ -64,27 +63,48 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  readyBadge: {
+  heroBottom: {
     position: "absolute",
-    left: scaleFont(18),
+    left: 0,
+    right: 0,
     bottom: SHEET_OVERLAP + scaleFont(10),
-    backgroundColor: COLORS.red,
-    paddingHorizontal: scaleFont(12),
-    paddingVertical: scaleFont(6),
-    borderRadius: scaleFont(20),
+    flexDirection: "row",
+    alignItems: "flex-end",
+    paddingHorizontal: scaleFont(16),
+    gap: scaleFont(10),
   },
-  readyText: {
-    fontSize: scaleFont(12),
-    fontWeight: "700",
-    color: COLORS.white,
+  thumbs: {
+    flexGrow: 0,
+    flexShrink: 1,
+  },
+  thumbsContent: {
+    gap: scaleFont(8),
+  },
+  thumb: {
+    width: scaleFont(44),
+    height: scaleFont(56),
+    borderRadius: scaleFont(10),
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "transparent",
+    backgroundColor: "rgba(255,255,255,0.35)",
+  },
+  thumbActive: {
+    borderColor: COLORS.white,
+  },
+  thumbImage: {
+    width: "100%",
+    height: "100%",
   },
 
   // Sheet
   sheet: {
     marginTop: -SHEET_OVERLAP,
+    zIndex: 2,
     backgroundColor: COLORS.white,
     borderTopLeftRadius: scaleFont(28),
     borderTopRightRadius: scaleFont(28),
+    overflow: "hidden",
     paddingHorizontal: scaleFont(20),
     paddingTop: scaleFont(22),
     paddingBottom: scaleFont(16),

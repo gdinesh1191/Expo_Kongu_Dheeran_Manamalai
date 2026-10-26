@@ -1,9 +1,9 @@
+import HeaderContentNew from "@/components/HeaderContent/HeaderContentNew";
 import { Feather } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import React, { useEffect, useMemo, useState } from "react";
-import { FlatList, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { WebView } from "react-native-webview";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, STATUS_STYLE, styles, THEME } from "./style";
 
 type TabKey = "history" | "punch";
@@ -22,55 +22,83 @@ type AttendanceRecord = {
   hours: string;
 };
 
-
-
 /* ---------- sample data (replace with your API) ---------- */
 
 const MY_ATTENDANCE_EMPLOYEE = { name: "KARTHICK", code: "4" };
 
-const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const MONTH_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 // Records for one month, newest day first. Future days are not included.
-function buildMonthRecords(year: number, month: number, today: Date = new Date()): AttendanceRecord[] {
-    const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
-    const lastDay = isCurrentMonth ? today.getDate() : new Date(year, month + 1, 0).getDate();
-   
-    const records: AttendanceRecord[] = [];
-    for (let d = lastDay; d >= 1; d--) {
-      const weekdayIndex = new Date(year, month, d).getDay();
-   
-      // Sample pattern: Sunday = Week Off, every 4th day = Absent, every 5th = Late, rest = Present.
-      let status: AttendanceStatus = "Present";
-      if (weekdayIndex === 0) status = "Week Off";
-      else if (d % 4 === 0) status = "Absent";
-      else if (d % 5 === 0) status = "Late";
-   
-      const worked = status === "Present" || status === "Late";
-      records.push({
-        key: `${year}-${month}-${d}`,
-        day: String(d).padStart(2, "0"),
-        monthShort: MONTH_SHORT[month].toUpperCase(),
-        weekday: WEEKDAYS[weekdayIndex],
-        status,
-        remark: status === "Late" ? "Late by 42 min" : "-",
-        punchIn: worked ? (status === "Late" ? "09:42 AM" : "09:01 AM") : "-",
-        punchOut: worked ? "06:10 PM" : "-",
-        hours: worked ? (status === "Late" ? "08:28" : "09:09") : "-",
-      });
-    }
-    return records;
+function buildMonthRecords(
+  year: number,
+  month: number,
+  today: Date = new Date(),
+): AttendanceRecord[] {
+  const isCurrentMonth =
+    today.getFullYear() === year && today.getMonth() === month;
+  const lastDay = isCurrentMonth
+    ? today.getDate()
+    : new Date(year, month + 1, 0).getDate();
+
+  const records: AttendanceRecord[] = [];
+  for (let d = lastDay; d >= 1; d--) {
+    const weekdayIndex = new Date(year, month, d).getDay();
+
+    // Sample pattern: Sunday = Week Off, every 4th day = Absent, every 5th = Late, rest = Present.
+    let status: AttendanceStatus = "Present";
+    if (weekdayIndex === 0) status = "Week Off";
+    else if (d % 4 === 0) status = "Absent";
+    else if (d % 5 === 0) status = "Late";
+
+    const worked = status === "Present" || status === "Late";
+    records.push({
+      key: `${year}-${month}-${d}`,
+      day: String(d).padStart(2, "0"),
+      monthShort: MONTH_SHORT[month].toUpperCase(),
+      weekday: WEEKDAYS[weekdayIndex],
+      status,
+      remark: status === "Late" ? "Late by 42 min" : "-",
+      punchIn: worked ? (status === "Late" ? "09:42 AM" : "09:01 AM") : "-",
+      punchOut: worked ? "06:10 PM" : "-",
+      hours: worked ? (status === "Late" ? "08:28" : "09:09") : "-",
+    });
   }
+  return records;
+}
 
 /* ---------- helpers ---------- */
-
-
 
 function lastSixMonths() {
   const now = new Date();
   return Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    return { year: d.getFullYear(), month: d.getMonth(), label: `${MONTH_SHORT[d.getMonth()]} ${d.getFullYear()}` };
+    return {
+      year: d.getFullYear(),
+      month: d.getMonth(),
+      label: `${MONTH_SHORT[d.getMonth()]} ${d.getFullYear()}`,
+    };
   });
 }
 
@@ -102,7 +130,12 @@ function DayCard({ item }: { item: AttendanceRecord }) {
   ];
 
   return (
-    <View style={[styles.card, { backgroundColor: tone.card, borderColor: tone.border }]}>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: tone.card, borderColor: tone.border },
+      ]}
+    >
       <View style={styles.cardDecor} />
 
       <View style={styles.cardTop}>
@@ -115,13 +148,18 @@ function DayCard({ item }: { item: AttendanceRecord }) {
           <Text style={styles.remark}>{item.remark}</Text>
         </View>
         <View style={[styles.pill, { backgroundColor: tone.pill }]}>
-          <Text style={[styles.pillText, { color: tone.pillText }]}>{item.status}</Text>
+          <Text style={[styles.pillText, { color: tone.pillText }]}>
+            {item.status}
+          </Text>
         </View>
       </View>
 
       <View style={styles.triRow}>
         {tri.map((m, i) => (
-          <View key={m.label} style={[styles.triCell, i > 0 && styles.triDivider]}>
+          <View
+            key={m.label}
+            style={[styles.triCell, i > 0 && styles.triDivider]}
+          >
             <Metric label={m.label} value={m.value} />
           </View>
         ))}
@@ -129,7 +167,6 @@ function DayCard({ item }: { item: AttendanceRecord }) {
     </View>
   );
 }
-
 
 /* ---------- Punch History tab ---------- */
 
@@ -141,7 +178,7 @@ function HistoryTab() {
   const current = months[selected];
   const records = useMemo(
     () => buildMonthRecords(current.year, current.month),
-    [current.year, current.month]
+    [current.year, current.month],
   );
 
   return (
@@ -150,14 +187,24 @@ function HistoryTab() {
         <View style={styles.employeeRow}>
           <Text style={styles.employeeName}>{MY_ATTENDANCE_EMPLOYEE.name}</Text>
           <View style={styles.employeeCode}>
-            <Text style={styles.employeeCodeText}>{MY_ATTENDANCE_EMPLOYEE.code}</Text>
+            <Text style={styles.employeeCodeText}>
+              {MY_ATTENDANCE_EMPLOYEE.code}
+            </Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.monthBtn} onPress={() => setOpen((v) => !v)} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.monthBtn}
+          onPress={() => setOpen((v) => !v)}
+          activeOpacity={0.8}
+        >
           <Feather name="calendar" size={15} color={THEME.text} />
           <Text style={styles.monthText}>{current.label}</Text>
-          <Feather name={open ? "chevron-up" : "chevron-down"} size={15} color={THEME.text} />
+          <Feather
+            name={open ? "chevron-up" : "chevron-down"}
+            size={15}
+            color={THEME.text}
+          />
         </TouchableOpacity>
 
         {open && (
@@ -165,7 +212,10 @@ function HistoryTab() {
             {months.map((m, i) => (
               <TouchableOpacity
                 key={m.label}
-                style={[styles.monthMenuItem, i === selected && styles.monthMenuItemActive]}
+                style={[
+                  styles.monthMenuItem,
+                  i === selected && styles.monthMenuItemActive,
+                ]}
                 onPress={() => {
                   setSelected(i);
                   setOpen(false);
@@ -184,7 +234,9 @@ function HistoryTab() {
         renderItem={({ item }) => <DayCard item={item} />}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<Text style={styles.empty}>No records for this month</Text>}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No records for this month</Text>
+        }
       />
     </View>
   );
@@ -288,9 +340,19 @@ function PunchTab() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.punchBtn} onPress={onPunch} activeOpacity={0.85}>
-        <Feather name={punchedIn ? "log-out" : "log-in"} size={18} color={COLORS.white} />
-        <Text style={styles.punchBtnText}>{punchedIn ? "Punch Out" : "Punch In"}</Text>
+      <TouchableOpacity
+        style={styles.punchBtn}
+        onPress={onPunch}
+        activeOpacity={0.85}
+      >
+        <Feather
+          name={punchedIn ? "log-out" : "log-in"}
+          size={18}
+          color={COLORS.white}
+        />
+        <Text style={styles.punchBtnText}>
+          {punchedIn ? "Punch Out" : "Punch In"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -303,44 +365,37 @@ export default function Attendance() {
 
   return (
     <View style={styles.background}>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={styles.safe} edges={["left", "right"]}>
-        {/* Header */}
-        <View style={styles.header}>
-         
-            <View>
-              
-              <Text style={styles.userName} numberOfLines={1}>
-                Attendance
-              </Text>
-          
-          </View>
-         
-        </View>
+      <HeaderContentNew
+        title="Attendance"
+        leftIcon="menu-2-fill"
+        rightIcon="notification-3-fill"
+        rightIconPress={() => navigation.navigate("notifications")}
+      />
 
-        {/* Tabs */}
-        <View style={styles.tabs}>
-          {(
-            [
-              { key: "history", label: "Punch History" },
-              { key: "punch", label: "Punch" },
-            ] as { key: TabKey; label: string }[]
-          ).map((t) => (
-            <TouchableOpacity
-              key={t.key}
-              style={[styles.tab, tab === t.key && styles.tabActive]}
-              onPress={() => setTab(t.key)}
-              activeOpacity={0.85}
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        {(
+          [
+            { key: "history", label: "Punch History" },
+            { key: "punch", label: "Punch" },
+          ] as { key: TabKey; label: string }[]
+        ).map((t) => (
+          <TouchableOpacity
+            key={t.key}
+            style={[styles.tab, tab === t.key && styles.tabActive]}
+            onPress={() => setTab(t.key)}
+            activeOpacity={0.85}
+          >
+            <Text
+              style={[styles.tabText, tab === t.key && styles.tabTextActive]}
             >
-              <Text style={[styles.tabText, tab === t.key && styles.tabTextActive]}>{t.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+              {t.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-      
-
-        {tab === "history" ? <HistoryTab /> : <PunchTab />}
-      </SafeAreaView>
+      {tab === "history" ? <HistoryTab /> : <PunchTab />}
     </View>
   );
 }

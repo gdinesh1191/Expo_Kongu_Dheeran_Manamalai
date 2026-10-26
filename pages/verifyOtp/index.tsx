@@ -1,4 +1,5 @@
 import OtpScreenShell from "@/components/OtpScreenShell";
+import { DUMMY_OTP } from "@/constants/DummyAuth";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useRef, useState } from "react";
 import {
@@ -18,6 +19,7 @@ export default function VerifyOtpPage() {
 
   const inputs = useRef<Array<TextInput | null>>([]);
   const [digits, setDigits] = useState<string[]>(Array(LENGTH).fill(""));
+  const [error, setError] = useState("");
 
   const focusAt = (index: number) => {
     inputs.current[index]?.focus();
@@ -25,6 +27,7 @@ export default function VerifyOtpPage() {
 
   const onChange = (text: string, index: number) => {
     const clean = text.replace(/\D/g, "");
+    if (error) setError("");
     if (clean.length > 1) {
       const next = Array(LENGTH).fill("");
       clean
@@ -51,12 +54,24 @@ export default function VerifyOtpPage() {
   };
 
   const onVerify = () => {
-    if (digits.join("").length < LENGTH) return;
-    navigation.navigate("Home");
+    const code = digits.join("");
+    if (code.length < LENGTH) {
+      setError(`Please enter the ${LENGTH}-digit OTP`);
+      return;
+    }
+    // TODO: replace the dummy check with your verify OTP API
+    if (code !== DUMMY_OTP) {
+      setError("Invalid OTP. Please try again.");
+      setDigits(Array(LENGTH).fill(""));
+      focusAt(0);
+      return;
+    }
+    navigation.reset({ index: 0, routes: [{ name: "Home", params: { role: "user" } }] });
   };
 
   const onResend = () => {
     setDigits(Array(LENGTH).fill(""));
+    setError("");
     focusAt(0);
   };
 
@@ -89,6 +104,8 @@ export default function VerifyOtpPage() {
           />
         ))}
       </View>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity
         activeOpacity={0.85}
@@ -142,6 +159,13 @@ const styles = StyleSheet.create({
     color: "#111827",
     fontSize: 22,
     fontWeight: "700",
+  },
+  error: {
+    color: "#FFCDD2",
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: -6,
+    marginBottom: 12,
   },
   button: {
     height: 46,

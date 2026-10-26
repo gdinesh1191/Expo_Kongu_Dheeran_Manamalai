@@ -1,8 +1,18 @@
 import BottomTabBar from "@/components/BottomTabBar";
+import FillImage from "@/components/FillImage";
 import { FEED_POSTS, FeedPost } from "@/constants/FeedPosts";
-import { Ionicons } from "@expo/vector-icons";
+import { MY_PROFILE } from "@/constants/SampleProfile";
+import { primaryPhoto } from "@/utils/profile";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
-import { FlatList, RefreshControl, Text, TouchableOpacity, View, ViewToken } from "react-native";
+import {
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewToken,
+} from "react-native";
 import FeedPostCard from "./FeedPost";
 import { COLORS, styles } from "./style";
 
@@ -19,14 +29,18 @@ export default function Home() {
     setRefreshing(false);
   }
 
-  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    const visible = new Set(
-      viewableItems
-        .filter((token) => token.isViewable)
-        .map((token) => (token.item as FeedPost).id),
-    );
-    setPlayingId((current) => (current && visible.has(current) ? current : null));
-  }).current;
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      const visible = new Set(
+        viewableItems
+          .filter((token) => token.isViewable)
+          .map((token) => (token.item as FeedPost).id),
+      );
+      setPlayingId((current) =>
+        current && visible.has(current) ? current : null,
+      );
+    },
+  ).current;
 
   function togglePlay(id: string) {
     setPlayingId((current) => (current === id ? null : id));
@@ -36,11 +50,25 @@ export default function Home() {
     <View style={styles.homeScreen}>
       <View style={styles.feedHeader}>
         <View style={styles.header}>
-          <Text style={styles.userName}>Daily feeds</Text>
+          <View style={styles.headerLeft}>
+            <View style={styles.headerAvatar}>
+              <Feather name="user" size={20} color="rgba(255,255,255,0.85)" />
+              <FillImage source={primaryPhoto(MY_PROFILE)} />
+            </View>
+            <View>
+              <Text style={styles.userName} numberOfLines={1}>
+                {MY_PROFILE.name}
+              </Text>
+              <Text style={styles.greeting}>Reg No: {MY_PROFILE.id}</Text>
+            </View>
+          </View>
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.iconBtn}>
-              <Ionicons name="notifications-outline" size={20} color={COLORS.red} />
-              <View style={styles.notifDot} />
+              <Ionicons
+                name="notifications-outline"
+                size={20}
+                color={COLORS.red}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -50,7 +78,10 @@ export default function Home() {
         data={FEED_POSTS}
         keyExtractor={(item) => item.id}
         style={styles.feedList}
-        contentContainerStyle={[styles.feedContent, FEED_POSTS.length === 0 && styles.emptyWrap]}
+        contentContainerStyle={[
+          styles.feedContent,
+          FEED_POSTS.length === 0 && styles.emptyWrap,
+        ]}
         showsVerticalScrollIndicator={false}
         extraData={playingId}
         viewabilityConfig={viewabilityConfig}
@@ -69,9 +100,15 @@ export default function Home() {
         }
         ListEmptyComponent={
           <>
-            <Ionicons name="chatbubbles-outline" size={48} color={COLORS.primary} />
+            <Ionicons
+              name="chatbubbles-outline"
+              size={48}
+              color={COLORS.primary}
+            />
             <Text style={styles.emptyTitle}>Nothing here yet</Text>
-            <Text style={styles.emptyText}>Official updates will show up in this feed.</Text>
+            <Text style={styles.emptyText}>
+              Official updates will show up in this feed.
+            </Text>
           </>
         }
         renderItem={({ item }) => (

@@ -1,18 +1,25 @@
 import { MY_PROFILE, Profile } from "@/constants/SampleProfile";
 import { scaleFont } from "@/constants/ScaleFont";
 import { COLORS } from "@/pages/Home/style";
-import { Detail, clean, getPoruthamMatch, imageSource, nameWithAge } from "@/utils/profile";
+import {
+    Detail,
+    clean,
+    getPoruthamMatch,
+    imageSource,
+    nameWithAge,
+    primaryPhoto,
+} from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  ImageSourcePropType,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
+    ImageSourcePropType,
+    Modal,
+    Pressable,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
 } from "react-native";
 import FillImage, { useImageRatio } from "./FillImage";
 
@@ -20,7 +27,13 @@ type FeatherIcon = React.ComponentProps<typeof Feather>["name"];
 
 const DEFAULT_CHART_RATIO = 2.75;
 
-export function SectionTitle({ title, icon }: { title: string; icon?: FeatherIcon }) {
+export function SectionTitle({
+  title,
+  icon,
+}: {
+  title: string;
+  icon?: FeatherIcon;
+}) {
   return (
     <View style={styles.sectionHeader}>
       {icon && (
@@ -64,7 +77,11 @@ export function ChipList({
 }) {
   if (!items.length) return null;
   const color =
-    variant === "success" ? COLORS.primary : variant === "danger" ? COLORS.red : COLORS.text;
+    variant === "success"
+      ? COLORS.primary
+      : variant === "danger"
+        ? COLORS.red
+        : COLORS.text;
   return (
     <View style={styles.chips}>
       {items.map((item) => (
@@ -78,7 +95,11 @@ export function ChipList({
 }
 
 /** Horoscope chart image; tapping opens it full screen. */
-export function HoroscopeChart({ source }: { source?: ImageSourcePropType | string }) {
+export function HoroscopeChart({
+  source,
+}: {
+  source?: ImageSourcePropType | string;
+}) {
   const [open, setOpen] = useState(false);
   const ratio = useImageRatio(source) ?? DEFAULT_CHART_RATIO;
   const window = useWindowDimensions();
@@ -101,7 +122,12 @@ export function HoroscopeChart({ source }: { source?: ImageSourcePropType | stri
         </View>
       </TouchableOpacity>
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+      <Modal
+        visible={open}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setOpen(false)}
+      >
         <Pressable style={styles.viewerBackdrop} onPress={() => setOpen(false)}>
           <View
             style={[styles.viewerChart, { width: viewerW, height: viewerH }]}
@@ -127,7 +153,7 @@ function PersonColumn({ profile, label }: { profile: Profile; label: string }) {
     <View style={styles.person}>
       <View style={styles.personPhoto}>
         <Feather name="user" size={28} color="rgba(255,255,255,0.8)" />
-        <FillImage source={profile.photo} />
+        <FillImage source={primaryPhoto(profile)} />
       </View>
       <Text style={styles.personLabel}>{label}</Text>
       <Text style={styles.personName} numberOfLines={2}>
@@ -143,7 +169,13 @@ function PersonColumn({ profile, label }: { profile: Profile; label: string }) {
 }
 
 /** Compares the logged-in user with a profile using the 10 poruthams. */
-export function PoruthamMatch({ profile, me = MY_PROFILE }: { profile: Profile; me?: Profile }) {
+export function PoruthamMatch({
+  profile,
+  me = MY_PROFILE,
+}: {
+  profile: Profile;
+  me?: Profile;
+}) {
   const { matched, unmatched, total } = getPoruthamMatch(profile);
   const grade = clean(profile.Porutham);
 
@@ -167,7 +199,12 @@ export function PoruthamMatch({ profile, me = MY_PROFILE }: { profile: Profile; 
       </View>
 
       <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${(matched.length / total) * 100}%` }]} />
+        <View
+          style={[
+            styles.progressFill,
+            { width: `${(matched.length / total) * 100}%` },
+          ]}
+        />
       </View>
 
       <SubTitle title={`Matched (${matched.length})`} />
@@ -189,7 +226,10 @@ export function PoruthamMatch({ profile, me = MY_PROFILE }: { profile: Profile; 
 
 const chipVariantStyles = StyleSheet.create({
   neutral: { backgroundColor: COLORS.primaryLight },
-  success: { backgroundColor: COLORS.primaryLight, borderColor: COLORS.primary },
+  success: {
+    backgroundColor: COLORS.primaryLight,
+    borderColor: COLORS.primary,
+  },
   danger: { backgroundColor: "#FDE7E7", borderColor: COLORS.red },
 });
 

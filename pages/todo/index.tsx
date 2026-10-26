@@ -1,6 +1,8 @@
+import HeaderContentNew from "@/components/HeaderContent/HeaderContentNew";
 import { scaleFont } from "@/constants/ScaleFont";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
@@ -31,7 +33,15 @@ type Todo = {
   priority: Priority;
 };
 
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 const WEEKDAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
   "January",
@@ -139,17 +149,29 @@ function sampleTasks(today: string): Todo[] {
 function accentColor(item: Todo) {
   if (item.done || item.priority === "medium") return COLORS.primary;
   if (item.priority === "high") return COLORS.high;
-  return "#E4E4E4";
+  return COLORS.low;
 }
 
 function badgeStyle(item: Todo) {
-  if (item.done) return { bg: COLORS.primaryLight, color: COLORS.primaryDark, label: "Done" };
-  if (item.priority === "high") return { bg: COLORS.highBg, color: COLORS.high, label: "High" };
-  if (item.priority === "low") return { bg: COLORS.lowBg, color: COLORS.low, label: "Low" };
-  return { bg: COLORS.primaryLight, color: COLORS.primaryDark, label: "Medium" };
+  if (item.done)
+    return {
+      bg: COLORS.primaryLight,
+      color: COLORS.primaryDark,
+      label: "Done",
+    };
+  if (item.priority === "high")
+    return { bg: COLORS.highBg, color: COLORS.high, label: "High" };
+  if (item.priority === "low")
+    return { bg: COLORS.lowBg, color: COLORS.low, label: "Low" };
+  return {
+    bg: COLORS.primaryLight,
+    color: COLORS.primaryDark,
+    label: "Medium",
+  };
 }
 
 export default function TodoPage() {
+  const navigation = useNavigation<any>();
   const today = useMemo(() => startOfDay(new Date()), []);
   const todayKey = dateKey(today);
   const days = useMemo(
@@ -213,9 +235,12 @@ export default function TodoPage() {
     });
   }, [dayTasks, filter]);
 
-  const selectedDate = days.find((day) => dateKey(day) === selectedKey) ?? today;
+  const selectedDate =
+    days.find((day) => dateKey(day) === selectedKey) ?? today;
   const progressLabel =
-    selectedKey === todayKey ? "Today's progress" : `${WEEKDAYS[selectedDate.getDay()]}'s progress`;
+    selectedKey === todayKey
+      ? "Today's progress"
+      : `${WEEKDAYS[selectedDate.getDay()]}'s progress`;
 
   function openCreate() {
     setTitle("");
@@ -253,7 +278,9 @@ export default function TodoPage() {
 
   function toggleTodo(id: string) {
     setTodos((current) =>
-      current.map((item) => (item.id === id ? { ...item, done: !item.done } : item)),
+      current.map((item) =>
+        item.id === id ? { ...item, done: !item.done } : item,
+      ),
     );
   }
 
@@ -263,22 +290,20 @@ export default function TodoPage() {
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => setTodos((current) => current.filter((todo) => todo.id !== item.id)),
+        onPress: () =>
+          setTodos((current) => current.filter((todo) => todo.id !== item.id)),
       },
     ]);
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>My tasks</Text>
-          <Text style={styles.date}>{headerDate(today)}</Text>
-        </View>
-        <View style={styles.bell}>
-          <Feather name="bell" size={20} color={COLORS.text} />
-        </View>
-      </View>
+      <HeaderContentNew
+        title="My Tasks"
+        leftIcon="menu-2-fill"
+        rightIcon="notification-3-fill"
+        rightIconPress={() => navigation.navigate("notifications")}
+      />
 
       <View style={styles.progress}>
         <Text style={styles.progressLabel}>{progressLabel}</Text>
@@ -286,7 +311,9 @@ export default function TodoPage() {
           {doneCount} of {dayTasks.length} tasks done
         </Text>
         <View style={styles.track}>
-          <View style={[styles.fill, { width: `${Math.round(progress * 100)}%` }]} />
+          <View
+            style={[styles.fill, { width: `${Math.round(progress * 100)}%` }]}
+          />
         </View>
       </View>
 
@@ -300,8 +327,12 @@ export default function TodoPage() {
               style={[styles.dayChip, active && styles.dayChipOn]}
               onPress={() => setSelectedKey(key)}
             >
-              <Text style={[styles.dayName, active && styles.dayNameOn]}>{WEEKDAY_SHORT[day.getDay()]}</Text>
-              <Text style={[styles.dayNum, active && styles.dayNumOn]}>{day.getDate()}</Text>
+              <Text style={[styles.dayName, active && styles.dayNameOn]}>
+                {WEEKDAY_SHORT[day.getDay()]}
+              </Text>
+              <Text style={[styles.dayNum, active && styles.dayNumOn]}>
+                {day.getDate()}
+              </Text>
             </Pressable>
           );
         })}
@@ -313,10 +344,17 @@ export default function TodoPage() {
           return (
             <Pressable
               key={item.key}
-              style={[styles.pill, active && styles.pillOn]}
+              style={[styles.priorityChip, active && styles.priorityChipOn]}
               onPress={() => setFilter(item.key)}
             >
-              <Text style={[styles.pillText, active && styles.pillTextOn]}>{item.label}</Text>
+              <Text
+                style={[
+                  styles.priorityChipText,
+                  active && styles.priorityChipTextOn,
+                ]}
+              >
+                {item.label}
+              </Text>
             </Pressable>
           );
         })}
@@ -337,22 +375,37 @@ export default function TodoPage() {
         renderItem={({ item }) => {
           const badge = badgeStyle(item);
           return (
-            <Pressable style={styles.card} onLongPress={() => confirmDelete(item)}>
-              <View style={[styles.accent, { backgroundColor: accentColor(item) }]} />
+            <Pressable
+              style={[styles.card, { borderLeftColor: accentColor(item) }]}
+              onLongPress={() => confirmDelete(item)}
+            >
+              {/* <View
+                style={[styles.accent, { backgroundColor: accentColor(item) }]}
+              /> */}
               <Pressable
                 style={[styles.check, item.done && styles.checkOn]}
                 onPress={() => toggleTodo(item.id)}
                 hitSlop={8}
               >
-                {item.done ? <Feather name="check" size={14} color={COLORS.white} /> : null}
+                {item.done ? (
+                  <Feather name="check" size={14} color={COLORS.white} />
+                ) : null}
               </Pressable>
               <View style={styles.cardBody}>
                 <View style={styles.titleRow}>
-                  <Text style={[styles.cardTitle, item.done && styles.cardTitleDone]} numberOfLines={2}>
+                  <Text
+                    style={[
+                      styles.cardTitle,
+                      item.done && styles.cardTitleDone,
+                    ]}
+                    numberOfLines={2}
+                  >
                     {item.title}
                   </Text>
                   <View style={[styles.badge, { backgroundColor: badge.bg }]}>
-                    <Text style={[styles.badgeText, { color: badge.color }]}>{badge.label}</Text>
+                    <Text style={[styles.badgeText, { color: badge.color }]}>
+                      {badge.label}
+                    </Text>
                   </View>
                 </View>
                 {item.note ? (
@@ -366,11 +419,20 @@ export default function TodoPage() {
         }}
       />
 
-      <TouchableOpacity style={styles.fab} onPress={openCreate} activeOpacity={0.85}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={openCreate}
+        activeOpacity={0.85}
+      >
         <Feather name="plus" size={scaleFont(26)} color={COLORS.white} />
       </TouchableOpacity>
 
-      <Modal visible={modalOpen} transparent animationType="fade" onRequestClose={closeCreate}>
+      <Modal
+        visible={modalOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={closeCreate}
+      >
         <KeyboardAvoidingView
           style={styles.modalRoot}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -378,7 +440,9 @@ export default function TodoPage() {
           <Pressable style={styles.backdrop} onPress={closeCreate} />
           <View style={styles.sheet}>
             <Text style={styles.sheetTitle}>New task</Text>
-            <Text style={styles.sheetHint}>Added to {headerDate(selectedDate)}</Text>
+            <Text style={styles.sheetHint}>
+              Added to {headerDate(selectedDate)}
+            </Text>
 
             <Text style={styles.label}>Title</Text>
             <TextInput
@@ -411,10 +475,18 @@ export default function TodoPage() {
                 return (
                   <Pressable
                     key={item.key}
-                    style={[styles.priorityChip, active && styles.priorityChipOn]}
+                    style={[
+                      styles.priorityChip,
+                      active && styles.priorityChipOn,
+                    ]}
                     onPress={() => setPriority(item.key)}
                   >
-                    <Text style={[styles.priorityChipText, active && styles.priorityChipTextOn]}>
+                    <Text
+                      style={[
+                        styles.priorityChipText,
+                        active && styles.priorityChipTextOn,
+                      ]}
+                    >
                       {item.label}
                     </Text>
                   </Pressable>

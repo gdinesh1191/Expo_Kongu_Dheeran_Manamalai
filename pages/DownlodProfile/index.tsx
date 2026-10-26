@@ -1,23 +1,34 @@
 import HeroPhoto, { useHeroHeight } from "@/components/HeroPhoto";
 import {
-  ChipList,
-  DetailsGrid,
-  HoroscopeChart,
-  SectionTitle,
-  SubTitle,
+    ChipList,
+    DetailsGrid,
+    HoroscopeChart,
+    SectionTitle,
+    SubTitle,
 } from "@/components/ProfileSections";
 import { Profile, SAMPLE_PROFILES } from "@/constants/SampleProfile";
 import {
-  clean,
-  dasaBalanceText,
-  details,
-  educationText,
-  nameWithAge,
+    clean,
+    dasaBalanceText,
+    details,
+    educationText,
+    imageSource,
+    nameWithAge,
+    profilePhotos,
 } from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useState } from "react";
-import { Alert, ScrollView, Share, Switch, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+    Alert,
+    Image,
+    ScrollView,
+    Share,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { COLORS, SHEET_OVERLAP, styles } from "./style";
 
 const FORMATS = [
@@ -44,7 +55,29 @@ export default function DownlodProfile() {
   const [hidePhone, setHidePhone] = useState(true);
   const [includeFamily, setIncludeFamily] = useState(true);
   const [includeChart, setIncludeChart] = useState(true);
-  const heroHeight = useHeroHeight(profile.photo, SHEET_OVERLAP);
+  const photos = profilePhotos(profile);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const activePhoto = photos[activeIndex] ?? photos[0];
+  const heroHeight = useHeroHeight(activePhoto, SHEET_OVERLAP);
+
+  useEffect(() => {
+    setActiveIndex(0);
+    setPaused(false);
+  }, [profile.id]);
+
+  useEffect(() => {
+    if (!includePhoto || paused || photos.length < 2) return;
+    const timer = setInterval(() => {
+      setActiveIndex((index) => (index + 1) % photos.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [includePhoto, paused, photos.length]);
+
+  function selectPhoto(index: number) {
+    setActiveIndex(index);
+    setPaused(true);
+  }
 
   const basic = details([
     ["Koottam", profile.Koottam],
@@ -87,11 +120,19 @@ export default function DownlodProfile() {
       ...basic.map((d) => `${d.label}: ${d.value}`),
     ];
     if (includeFamily && hasFamily) {
-      lines.push("", "FAMILY AND ASSETS", ...family.map((d) => `${d.label}: ${d.value}`));
+      lines.push(
+        "",
+        "FAMILY AND ASSETS",
+        ...family.map((d) => `${d.label}: ${d.value}`),
+      );
       if (assets.length) lines.push(`Assets: ${assets.join(", ")}`);
     }
     if (horoscope.length) {
-      lines.push("", "HOROSCOPE", ...horoscope.map((d) => `${d.label}: ${d.value}`));
+      lines.push(
+        "",
+        "HOROSCOPE",
+        ...horoscope.map((d) => `${d.label}: ${d.value}`),
+      );
     }
     return lines.join("\n");
   }
@@ -113,10 +154,30 @@ export default function DownlodProfile() {
   }
 
   const toggles = [
-    { label: "Profile photo", value: includePhoto, onChange: setIncludePhoto, show: true },
-    { label: "Hide phone number", value: hidePhone, onChange: setHidePhone, show: true },
-    { label: "Family details", value: includeFamily, onChange: setIncludeFamily, show: hasFamily },
-    { label: "Horoscope chart", value: includeChart, onChange: setIncludeChart, show: hasChart },
+    {
+      label: "Profile photo",
+      value: includePhoto,
+      onChange: setIncludePhoto,
+      show: true,
+    },
+    {
+      label: "Hide phone number",
+      value: hidePhone,
+      onChange: setHidePhone,
+      show: true,
+    },
+    {
+      label: "Family details",
+      value: includeFamily,
+      onChange: setIncludeFamily,
+      show: hasFamily,
+    },
+    {
+      label: "Horoscope chart",
+      value: includeChart,
+      onChange: setIncludeChart,
+      show: hasChart,
+    },
   ].filter((t) => t.show);
 
   return (
@@ -124,8 +185,8 @@ export default function DownlodProfile() {
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         {/* Photo / hero */}
         <View style={[styles.hero, { height: heroHeight }]}>
-          {includePhoto && profile.photo ? (
-            <HeroPhoto source={profile.photo} bottomInset={SHEET_OVERLAP} />
+          {includePhoto && activePhoto ? (
+            <HeroPhoto source={activePhoto} bottomInset={SHEET_OVERLAP} />
           ) : includePhoto ? (
             <View style={styles.avatarWrap}>
               <View style={styles.avatarHead} />
@@ -134,12 +195,17 @@ export default function DownlodProfile() {
           ) : (
             <View style={styles.photoHidden}>
               <Feather name="eye-off" size={30} color={COLORS.white} />
-              <Text style={styles.photoHiddenText}>Photo hidden in biodata</Text>
+              <Text style={styles.photoHiddenText}>
+                Photo hidden in biodata
+              </Text>
             </View>
           )}
 
           <View style={styles.heroTopRow}>
-            <TouchableOpacity style={styles.heroBtn} onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              style={styles.heroBtn}
+              onPress={() => navigation.goBack()}
+            >
               <Feather name="chevron-left" size={22} color={COLORS.red} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.heroBtn} onPress={handleShare}>
@@ -147,9 +213,34 @@ export default function DownlodProfile() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.readyBadge}>
-            <Text style={styles.readyText}>Biodata ready</Text>
-          </View>
+          {includePhoto && photos.length > 1 && (
+            <View style={styles.heroBottom}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.thumbs}
+                contentContainerStyle={styles.thumbsContent}
+              >
+                {photos.map((photo, index) => {
+                  const source = imageSource(photo);
+                  if (!source) return null;
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      activeOpacity={0.85}
+                      onPress={() => selectPhoto(index)}
+                      style={[
+                        styles.thumb,
+                        index === activeIndex && styles.thumbActive,
+                      ]}
+                    >
+                      <Image source={source} style={styles.thumbImage} />
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
         </View>
 
         {/* Details sheet */}
@@ -179,7 +270,9 @@ export default function DownlodProfile() {
             <>
               <SectionTitle title="Horoscope" icon="sun" />
               <DetailsGrid items={horoscope} />
-              {includeChart && <HoroscopeChart source={profile.horoscopeImage} />}
+              {includeChart && (
+                <HoroscopeChart source={profile.horoscopeImage} />
+              )}
             </>
           )}
 
@@ -190,7 +283,10 @@ export default function DownlodProfile() {
               return (
                 <TouchableOpacity
                   key={item.key}
-                  style={[styles.formatOption, active && styles.formatOptionActive]}
+                  style={[
+                    styles.formatOption,
+                    active && styles.formatOptionActive,
+                  ]}
                   onPress={() => setFormat(item.key)}
                 >
                   <Feather
@@ -198,7 +294,12 @@ export default function DownlodProfile() {
                     size={18}
                     color={active ? COLORS.white : COLORS.text}
                   />
-                  <Text style={[styles.formatText, active && styles.formatTextActive]}>
+                  <Text
+                    style={[
+                      styles.formatText,
+                      active && styles.formatTextActive,
+                    ]}
+                  >
                     {item.key}
                   </Text>
                 </TouchableOpacity>
@@ -208,12 +309,18 @@ export default function DownlodProfile() {
 
           <Text style={styles.sectionTitle}>Include in biodata</Text>
           {toggles.map((item, index) => (
-            <View key={item.label} style={[styles.toggleRow, index > 0 && styles.toggleDivider]}>
+            <View
+              key={item.label}
+              style={[styles.toggleRow, index > 0 && styles.toggleDivider]}
+            >
               <Text style={styles.toggleLabel}>{item.label}</Text>
               <Switch
                 value={item.value}
                 onValueChange={item.onChange}
-                trackColor={{ false: COLORS.primaryLight, true: COLORS.primary }}
+                trackColor={{
+                  false: COLORS.primaryLight,
+                  true: COLORS.primary,
+                }}
                 thumbColor={COLORS.white}
               />
             </View>

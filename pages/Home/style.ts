@@ -21,13 +21,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: scaleFont(18),
   },
-  
+
   // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: scaleFont(14),
+    paddingTop: scaleFont(10),
   },
   headerLeft: {
     flexDirection: "row",
@@ -37,6 +37,17 @@ export const styles = StyleSheet.create({
   logo: {
     width: scaleFont(40),
     height: scaleFont(40),
+  },
+  headerAvatar: {
+    width: scaleFont(40),
+    height: scaleFont(40),
+    borderRadius: scaleFont(20),
+    borderWidth: 2,
+    borderColor: COLORS.white,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
   greeting: {
     fontSize: scaleFont(12),
@@ -52,25 +63,14 @@ export const styles = StyleSheet.create({
     gap: scaleFont(10),
   },
   iconBtn: {
-    width: scaleFont(42),
-    height: scaleFont(42),
-    borderRadius: scaleFont(14),
+    width: scaleFont(32),
+    height: scaleFont(32),
+    borderRadius: scaleFont(10),
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: COLORS.white,
-  },
-  notifDot: {
-    position: "absolute",
-    top: scaleFont(10),
-    right: scaleFont(11),
-    width: scaleFont(8),
-    height: scaleFont(8),
-    borderRadius: scaleFont(4),
-    backgroundColor: COLORS.red,
-    borderWidth: 1,
-    borderColor: COLORS.white,
   },
 
   // Segmented toggle
@@ -181,6 +181,30 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: scaleFont(105),
     backgroundColor: "rgba(255,255,255,0.2)",
     marginBottom: -scaleFont(30),
+  },
+  poruthamBadge: {
+    position: "absolute",
+    top: scaleFont(16),
+    right: scaleFont(16),
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(5),
+    paddingHorizontal: scaleFont(12),
+    paddingVertical: scaleFont(6),
+    borderRadius: scaleFont(16),
+    backgroundColor: COLORS.red,
+    borderWidth: 1.5,
+    borderColor: COLORS.white,
+    shadowColor: COLORS.red,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  poruthamBadgeText: {
+    fontSize: scaleFont(14),
+    fontWeight: "800",
+    color: COLORS.white,
   },
   cardInfo: {
     position: "absolute",
@@ -295,7 +319,7 @@ export const styles = StyleSheet.create({
   },
   feedHeader: {
     paddingHorizontal: scaleFont(18),
-    paddingBottom: scaleFont(14),
+    paddingBottom: scaleFont(10),
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
@@ -306,7 +330,7 @@ export const styles = StyleSheet.create({
   },
   feedContent: {
     paddingTop: scaleFont(12),
-    paddingBottom: scaleFont(18),
+    paddingBottom: scaleFont(4),
   },
   post: {
     flexDirection: "row",

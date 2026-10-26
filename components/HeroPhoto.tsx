@@ -17,10 +17,12 @@ export function useHeroHeight(source: ImageSourcePropType | string | undefined, 
   return Math.min(width / ratio, height * MAX_HEIGHT_RATIO) + overlap;
 }
 
-/** Full (uncropped) photo over a blurred copy that fills any leftover space. */
+/**
+ * Photo fills the hero edge to edge. The rounded sheet sits on top, so the bottom
+ * of the photo does not leave a rectangular strip along the card.
+ */
 export default function HeroPhoto({
   source,
-  bottomInset = 0,
 }: {
   source?: ImageSourcePropType | string;
   bottomInset?: number;
@@ -28,9 +30,9 @@ export default function HeroPhoto({
   if (!imageSource(source)) return null;
   return (
     <>
-      <FillImage source={source} align="center" blurRadius={18} />
-      <View style={[StyleSheet.absoluteFill, { bottom: bottomInset }]} pointerEvents="none">
-        <FillImage source={source} mode="contain" align="center" />
+      <FillImage source={source} align="top" blurRadius={18} />
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        <FillImage source={source} mode="cover" align="top" />
       </View>
     </>
   );

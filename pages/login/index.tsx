@@ -1,12 +1,12 @@
+import KeyboardAwareScrollView from "@/components/KeyboardAwareScrollView";
+import { checkCredentials, LoginRole } from "@/constants/DummyAuth";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import {
   Image,
   ImageBackground,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -37,9 +37,9 @@ const COLORS = {
   redDark: "#8E1212",
   soft: "rgba(255,255,255,0.75)",
   secure: "#8FD0A6",
+  errorText: "#FFCDD2",
+  errorBorder: "#E53935",
 };
-
-type LoginRole = "user" | "staff";
 
 export default function LoginPage() {
   const navigation = useNavigation<any>();
@@ -48,10 +48,45 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const onChangeRole = (next: LoginRole) => {
+    setRole(next);
+    setUsernameError("");
+    setPasswordError("");
+  };
 
   const onLogin = () => {
-    // TODO: call your login API with { username, password, remember, role }
-    navigation.navigate("SendOtp", { role });
+    const nextUsernameError = !username.trim() ? "Username is required" : "";
+    const nextPasswordError = !password
+      ? "Password is required"
+      : password.length < 6
+        ? "Password must be at least 6 characters"
+        : "";
+    setUsernameError(nextUsernameError);
+    setPasswordError(nextPasswordError);
+    if (nextUsernameError || nextPasswordError) return;
+
+    // TODO: replace the dummy check with your login API { username, password, remember, role }
+    const result = checkCredentials(role, username, password);
+    if (result === "invalidUsername") {
+      setUsernameError(`No ${role} account found with this username`);
+      return;
+    }
+    if (result === "invalidPassword") {
+      setPasswordError("Incorrect password");
+      return;
+    }
+
+    if (role === "staff") {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Attendance", params: { role } }],
+      });
+    } else {
+      navigation.navigate("SendOtp", { role });
+    }
   };
 
   return (
@@ -60,151 +95,167 @@ export default function LoginPage() {
       <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
         <View style={styles.overlay} />
 
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        <KeyboardAwareScrollView
+          extraScrollHeight={180}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scroll}
         >
-          <ScrollView
-            contentContainerStyle={styles.scroll}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
+          {/* Logo */}
+          <Image source={LOGO} style={styles.logo} resizeMode="contain" />
+
+          {/* Titles */}
+          <Text
+            style={styles.title}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
           >
-            {/* Logo */}
-            <Image source={LOGO} style={styles.logo} resizeMode="contain" />
+            Kongu Dheeran Manamalai
+          </Text>
+          <View style={styles.homeRow}>
+            <View style={styles.line} />
+            <Text style={styles.home}>Home</Text>
+            <View style={styles.line} />
+          </View>
 
-            {/* Titles */}
-            <Text
-              style={styles.title}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.7}
-            >
-              Kongu Dheeran Manamalai
-            </Text>
-            <View style={styles.homeRow}>
-              <View style={styles.line} />
-              <Text style={styles.home}>Home</Text>
-              <View style={styles.line} />
-            </View>
+          <Text style={styles.subtitle}>Sign in to continue</Text>
 
-            <Text style={styles.subtitle}>Sign in to continue</Text>
-
-            <View style={styles.roleRow}>
-              <Pressable
-                style={[styles.roleOption, role === "user" && styles.roleOptionOn]}
-                onPress={() => setRole("user")}
-              >
-                <RemixIcon
-                  name="user-3-line"
-                  size={18}
-                  color={role === "user" ? COLORS.tabText : COLORS.cream}
-                />
-                <Text
-                  style={[styles.roleText, role === "user" && styles.roleTextOn]}
-                  numberOfLines={1}
-                >
-                  User Login
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[styles.roleOption, role === "staff" && styles.roleOptionOn]}
-                onPress={() => setRole("staff")}
-              >
-                <RemixIcon
-                  name="shield-user-line"
-                  size={18}
-                  color={role === "staff" ? COLORS.tabText : COLORS.cream}
-                />
-                <Text
-                  style={[styles.roleText, role === "staff" && styles.roleTextOn]}
-                  numberOfLines={1}
-                >
-                  Staff Login
-                </Text>
-              </Pressable>
-            </View>
-
-            {/* Username */}
-            <View style={styles.field}>
-              <RemixIcon name="user-3-line" size={24} color={COLORS.icon} />
-              <View style={styles.divider} />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter username"
-                placeholderTextColor={COLORS.fieldText}
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            {/* Password */}
-            <View style={styles.field}>
-              <RemixIcon name="lock-line" size={24} color={COLORS.icon} />
-              <View style={styles.divider} />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter password"
-                placeholderTextColor={COLORS.fieldText}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <Pressable
-                onPress={() => setShowPassword((v) => !v)}
-                hitSlop={10}
-              >
-                <RemixIcon
-                  name={showPassword ? "eye-off-line" : "eye-line"}
-                  size={24}
-                  color={COLORS.icon}
-                />
-              </Pressable>
-            </View>
-
-            {/* Remember me */}
+          <View style={styles.roleRow}>
             <Pressable
-              style={styles.rememberRow}
-              onPress={() => setRemember((v) => !v)}
+              style={[
+                styles.roleOption,
+                role === "user" && styles.roleOptionOn,
+              ]}
+              onPress={() => onChangeRole("user")}
             >
-              <View style={[styles.checkbox, remember && styles.checkboxOn]}>
-                {remember && (
-                  <RemixIcon name="check-line" size={16} color={COLORS.white} />
-                )}
-              </View>
-              <Text style={styles.rememberText}>Remember me</Text>
-            </Pressable>
-
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={onLogin}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText} numberOfLines={1}>
-                Log In
+              <RemixIcon
+                name="user-3-line"
+                size={18}
+                color={role === "user" ? COLORS.tabText : COLORS.cream}
+              />
+              <Text
+                style={[styles.roleText, role === "user" && styles.roleTextOn]}
+                numberOfLines={1}
+              >
+                User Login
               </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.roleOption,
+                role === "staff" && styles.roleOptionOn,
+              ]}
+              onPress={() => onChangeRole("staff")}
+            >
               <RemixIcon
-                name="arrow-right-line"
-                size={16}
-                color={COLORS.white}
+                name="shield-user-line"
+                size={18}
+                color={role === "staff" ? COLORS.tabText : COLORS.cream}
               />
-            </TouchableOpacity>
+              <Text
+                style={[styles.roleText, role === "staff" && styles.roleTextOn]}
+                numberOfLines={1}
+              >
+                Staff Login
+              </Text>
+            </Pressable>
+          </View>
 
-            {/* Secure note */}
-            <View style={styles.secureRow}>
+          {/* Username */}
+          <View
+            style={[styles.field, usernameError ? styles.fieldError : null]}
+          >
+            <RemixIcon name="user-3-line" size={24} color={COLORS.icon} />
+            <View style={styles.divider} />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter username"
+              placeholderTextColor={COLORS.fieldText}
+              value={username}
+              onChangeText={(text) => {
+                setUsername(text);
+                if (usernameError) setUsernameError("");
+              }}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+          <FieldError message={usernameError} />
+
+          {/* Password */}
+          <View
+            style={[styles.field, passwordError ? styles.fieldError : null]}
+          >
+            <RemixIcon name="lock-line" size={24} color={COLORS.icon} />
+            <View style={styles.divider} />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter password"
+              placeholderTextColor={COLORS.fieldText}
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (passwordError) setPasswordError("");
+              }}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={10}>
               <RemixIcon
-                name="shield-check-line"
-                size={20}
-                color={COLORS.secure}
+                name={showPassword ? "eye-off-line" : "eye-line"}
+                size={24}
+                color={COLORS.icon}
               />
-              <Text style={styles.secureText}>Secure sign in</Text>
+            </Pressable>
+          </View>
+          <FieldError message={passwordError} />
+
+          {/* Remember me */}
+          <Pressable
+            style={styles.rememberRow}
+            onPress={() => setRemember((v) => !v)}
+          >
+            <View style={[styles.checkbox, remember && styles.checkboxOn]}>
+              {remember && (
+                <RemixIcon name="check-line" size={16} color={COLORS.white} />
+              )}
             </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
+            <Text style={styles.rememberText}>Remember me</Text>
+          </Pressable>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={onLogin}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText} numberOfLines={1}>
+              Log In
+            </Text>
+            <RemixIcon name="arrow-right-line" size={16} color={COLORS.white} />
+          </TouchableOpacity>
+
+          {/* Secure note */}
+          <View style={styles.secureRow}>
+            <RemixIcon
+              name="shield-check-line"
+              size={20}
+              color={COLORS.secure}
+            />
+            <Text style={styles.secureText}>Secure sign in</Text>
+          </View>
+        </KeyboardAwareScrollView>
       </ImageBackground>
+    </View>
+  );
+}
+
+function FieldError({ message }: { message: string }) {
+  if (!message) return null;
+  return (
+    <View style={styles.errorRow}>
+      <RemixIcon name="error-warning-line" size={16} color={COLORS.errorText} />
+      <Text style={styles.errorText}>{message}</Text>
     </View>
   );
 }
@@ -305,7 +356,10 @@ const styles = StyleSheet.create({
     height: 52,
     paddingHorizontal: 24,
     marginBottom: 18,
+    borderWidth: 1.5,
+    borderColor: "transparent",
   },
+  fieldError: { borderColor: COLORS.errorBorder },
   divider: {
     width: 1,
     height: 34,
@@ -338,6 +392,16 @@ const styles = StyleSheet.create({
   },
   checkboxOn: { backgroundColor: COLORS.red, borderColor: COLORS.red },
   rememberText: { color: COLORS.white, fontSize: 14 },
+
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: -12,
+    marginBottom: 14,
+    marginLeft: 4,
+  },
+  errorText: { color: COLORS.errorText, fontSize: 13, flex: 1 },
 
   button: {
     flexDirection: "row",

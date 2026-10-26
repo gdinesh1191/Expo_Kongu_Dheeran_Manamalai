@@ -1,7 +1,7 @@
+import FillImage from "@/components/FillImage";
 import { Profile } from "@/constants/SampleProfile";
-import HeroPhoto from "@/components/HeroPhoto";
-import { clean, details, nameWithAge } from "@/utils/profile";
-import { Feather } from "@expo/vector-icons";
+import { clean, details, getPoruthamMatch, nameWithAge, primaryPhoto } from "@/utils/profile";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -43,6 +43,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
     ["Koottam", profile.Koottam],
     ["Porutham", profile.Porutham],
   ]);
+  const porutham = getPoruthamMatch(profile);
 
   return (
     <View style={styles.card}>
@@ -50,9 +51,16 @@ export function ProfileCard({ profile }: { profile: Profile }) {
         <View style={styles.avatarHead} />
         <View style={styles.avatarBody} />
       </View>
-      <HeroPhoto source={profile.photo} />
+      <FillImage source={primaryPhoto(profile)} mode="cover" align="top" />
 
       <View pointerEvents="none" style={styles.gradient} />
+
+      <View style={styles.poruthamBadge}>
+        <Ionicons name="heart" size={14} color={COLORS.white} />
+        <Text style={styles.poruthamBadgeText}>
+          {porutham.matched.length}/{porutham.total}
+        </Text>
+      </View>
 
       <View style={styles.cardInfo}>
         <Text style={styles.profileName}>{nameWithAge(profile)}</Text>
@@ -87,7 +95,12 @@ type Props = {
   onSwipe: (direction: SwipeDirection) => void;
 };
 
-export default function SwipeCard({ profile, previousProfile, nextProfile, onSwipe }: Props) {
+export default function SwipeCard({
+  profile,
+  previousProfile,
+  nextProfile,
+  onSwipe,
+}: Props) {
   const x = useSharedValue(0);
   const y = useSharedValue(0);
   const hasPrevious = !!previousProfile;
@@ -115,7 +128,9 @@ export default function SwipeCard({ profile, previousProfile, nextProfile, onSwi
       }
 
       if (axis.value === "horizontal") {
-        const blocked = (e.translationX > 0 && !hasPrevious) || (e.translationX < 0 && !hasNext);
+        const blocked =
+          (e.translationX > 0 && !hasPrevious) ||
+          (e.translationX < 0 && !hasNext);
         x.value = blocked ? e.translationX * EDGE_RESISTANCE : e.translationX;
         y.value = 0;
       } else {
@@ -128,22 +143,34 @@ export default function SwipeCard({ profile, previousProfile, nextProfile, onSwi
       const vertical = axis.value === "vertical";
       axis.value = "none";
       const passed =
-        Math.abs(e.translationX) > SWIPE_X_THRESHOLD || Math.abs(e.velocityX) > FLING_VELOCITY;
+        Math.abs(e.translationX) > SWIPE_X_THRESHOLD ||
+        Math.abs(e.velocityX) > FLING_VELOCITY;
       const goingRight = e.translationX > 0;
 
       if (horizontal && passed && (goingRight ? hasPrevious : hasNext)) {
         const target = goingRight ? OFFSCREEN_X : -OFFSCREEN_X;
         const remaining = Math.abs(target - x.value);
         const speed = Math.max(Math.abs(e.velocityX), 1800);
-        const duration = Math.min(Math.max((remaining / speed) * 1000, 180), 320);
+        const duration = Math.min(
+          Math.max((remaining / speed) * 1000, 180),
+          320,
+        );
 
-        x.value = withTiming(target, { duration, easing: Easing.out(Easing.cubic) }, (finished) => {
-          if (finished) runOnJS(onSwipe)(goingRight ? "previous" : "next");
-        });
+        x.value = withTiming(
+          target,
+          { duration, easing: Easing.out(Easing.cubic) },
+          (finished) => {
+            if (finished) runOnJS(onSwipe)(goingRight ? "previous" : "next");
+          },
+        );
         return;
       }
 
-      if (vertical && (e.translationY < -SWIPE_UP_THRESHOLD || e.velocityY < -UP_FLING_VELOCITY)) {
+      if (
+        vertical &&
+        (e.translationY < -SWIPE_UP_THRESHOLD ||
+          e.velocityY < -UP_FLING_VELOCITY)
+      ) {
         runOnJS(onSwipe)("up");
       }
 
@@ -176,7 +203,12 @@ export default function SwipeCard({ profile, previousProfile, nextProfile, onSwi
   // The card behind grows to full size as the top card leaves, so the swap is seamless.
   const backCardStyle = (visible: boolean) => {
     "worklet";
-    const progress = interpolate(Math.abs(x.value), [0, SCREEN_WIDTH], [0, 1], Extrapolation.CLAMP);
+    const progress = interpolate(
+      Math.abs(x.value),
+      [0, SCREEN_WIDTH],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
     return {
       opacity: visible ? interpolate(progress, [0, 1], [0.6, 1]) : 0,
       transform: [
@@ -193,18 +225,29 @@ export default function SwipeCard({ profile, previousProfile, nextProfile, onSwi
     opacity:
       Math.abs(x.value) > Math.abs(y.value)
         ? 0
-        : interpolate(y.value, [-SWIPE_UP_THRESHOLD, 0], [1, 0], Extrapolation.CLAMP),
+        : interpolate(
+            y.value,
+            [-SWIPE_UP_THRESHOLD, 0],
+            [1, 0],
+            Extrapolation.CLAMP,
+          ),
   }));
 
   return (
     <>
       {previousProfile && (
-        <Animated.View style={[styles.cardLayer, previousLayerStyle]} pointerEvents="none">
+        <Animated.View
+          style={[styles.cardLayer, previousLayerStyle]}
+          pointerEvents="none"
+        >
           <ProfileCard profile={previousProfile} />
         </Animated.View>
       )}
       {nextProfile && (
-        <Animated.View style={[styles.cardLayer, nextLayerStyle]} pointerEvents="none">
+        <Animated.View
+          style={[styles.cardLayer, nextLayerStyle]}
+          pointerEvents="none"
+        >
           <ProfileCard profile={nextProfile} />
         </Animated.View>
       )}
@@ -216,7 +259,9 @@ export default function SwipeCard({ profile, previousProfile, nextProfile, onSwi
             style={[styles.stamp, styles.stampDetails, detailsStampStyle]}
             pointerEvents="none"
           >
-            <Text style={[styles.stampText, { color: COLORS.white }]}>VIEW PROFILE</Text>
+            <Text style={[styles.stampText, { color: COLORS.white }]}>
+              VIEW PROFILE
+            </Text>
           </Animated.View>
         </Animated.View>
       </GestureDetector>

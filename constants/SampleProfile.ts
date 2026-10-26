@@ -11,7 +11,7 @@ export type Profile = {
   WorkingCategory?: string;
   location: string;
   Designation: string;
-  photo?: ImageSourcePropType | string;
+  photos?: (ImageSourcePropType | string)[];
   Height?: string;
   MaritalStatus?: string;
   Horoscope?: string;
@@ -38,7 +38,6 @@ export type Profile = {
   Poruthams: string[];
 };
 
-
 export const SAMPLE_PROFILES: Profile[] = [
   {
     id: "TG30930",
@@ -51,7 +50,10 @@ export const SAMPLE_PROFILES: Profile[] = [
     WorkingCategory: "Not Working",
     location: "Sankagiri, Nattampalayam",
     Designation: "N/A",
-    photo: require("../assets/Images/durga.png"),
+    photos: [
+      require("../assets/Images/durga2.png"),
+      require("../assets/Images/durga.png"),
+    ],
     Height: "171 cm",
     MaritalStatus: "First Marriage",
     Horoscope: "Sutham",
@@ -75,7 +77,15 @@ export const SAMPLE_PROFILES: Profile[] = [
     Year: "05",
     Month: "04",
     Day: "04",
-    Poruthams: ["Thinam", "Kanam", "Sthritheerkam", "Rasi", "Rasi Athipathi", "Rajju", "Vethai"],
+    Poruthams: [
+      "Thinam",
+      "Kanam",
+      "Sthritheerkam",
+      "Rasi",
+      "Rasi Athipathi",
+      "Rajju",
+      "Vethai",
+    ],
   },
 
   {
@@ -89,7 +99,11 @@ export const SAMPLE_PROFILES: Profile[] = [
     WorkingCategory: "Private Job",
     location: "Rasipuram, K.K. Valasu",
     Designation: "Software",
-    photo: require("../assets/Images/vidhya.png"),
+    photos: [
+      require("../assets/Images/vidhya2.png"),
+      require("../assets/Images/vidhya.png"),
+      require("../assets/Images/vidhya3.png"),
+    ],
     Height: "165 cm",
     MaritalStatus: "First Marriage",
     Horoscope: "Sutham",
@@ -113,7 +127,14 @@ export const SAMPLE_PROFILES: Profile[] = [
     Year: "08",
     Month: "06",
     Day: "27",
-    Poruthams: ["Kanam", "Mahendiram", "Yoni", "Rasi Athipathi", "Rajju", "Vethai"],
+    Poruthams: [
+      "Kanam",
+      "Mahendiram",
+      "Yoni",
+      "Rasi Athipathi",
+      "Rajju",
+      "Vethai",
+    ],
   },
 
   {
@@ -127,7 +148,11 @@ export const SAMPLE_PROFILES: Profile[] = [
     WorkingCategory: "Private Job",
     location: "Tiruchengode, Vattur",
     Designation: "Teacher",
-    photo: require("../assets/Images/preetha.png"),
+    photos: [
+      require("../assets/Images/preetha2.png"),
+      require("../assets/Images/preetha.png"),
+      require("../assets/Images/preetha3.png"),
+    ],
     Height: "159 cm",
     MaritalStatus: "First Marriage",
     Horoscope: "Sutham",
@@ -151,7 +176,17 @@ export const SAMPLE_PROFILES: Profile[] = [
     Year: "01",
     Month: "03",
     Day: "03",
-    Poruthams: ["Thinam", "Kanam", "Mahendiram", "Sthritheerkam", "Yoni", "Rasi", "Rasi Athipathi", "Rajju", "Vethai"],
+    Poruthams: [
+      "Thinam",
+      "Kanam",
+      "Mahendiram",
+      "Sthritheerkam",
+      "Yoni",
+      "Rasi",
+      "Rasi Athipathi",
+      "Rajju",
+      "Vethai",
+    ],
   },
 
   {
@@ -165,7 +200,11 @@ export const SAMPLE_PROFILES: Profile[] = [
     WorkingCategory: "Not Working",
     location: "Kallakurichi, Kallakurichi",
     Designation: "N/A",
-    photo: require("../assets/Images/monica.png"),
+    photos: [
+      require("../assets/Images/monica2.png"),
+      require("../assets/Images/monica.png"),
+      require("../assets/Images/monica3.png"),
+    ],
     Height: "168 cm",
     MaritalStatus: "First Marriage",
     Horoscope: "Sutham",
@@ -177,7 +216,12 @@ export const SAMPLE_PROFILES: Profile[] = [
     MotherName: "S.Devika",
     MotherOccupation: "Home Maker",
     SiblingsCount: "Younger Sister -1 (MBBS)",
-    Property: ["Floor House -3", "8 Acres Agri Land","Plots -8", "(Approx. Asset Value 20 Crores)"],
+    Property: [
+      "Floor House -3",
+      "8 Acres Agri Land",
+      "Plots -8",
+      "(Approx. Asset Value 20 Crores)",
+    ],
     expectations: "Doctor Or Business",
     AboardExpectation: "Not Yet Decided",
     Note: "",
@@ -203,7 +247,10 @@ export const SAMPLE_PROFILES: Profile[] = [
     WorkingCategory: " Private Job",
     location: "Rasipuram, Masakkalipatty",
     Designation: "Software",
-    photo: require("../assets/Images/Vinupriya.png"),
+    photos: [
+      require("../assets/Images/Vinupriya2.png"),
+      require("../assets/Images/Vinupriya.png"),
+    ],
     Height: "168 cm",
     MaritalStatus: "First Marriage",
     Horoscope: "Sutham",
@@ -248,7 +295,7 @@ export const MY_PROFILE: MyProfileData = {
   WorkingCategory: "Business",
   location: "Andagalur Gate",
   Designation: "N/A",
-  photo: require("../assets/Images/Kumaresan.png"),
+  photos: [require("../assets/Images/Kumaresan.png")],
   Height: " 174 cm",
   MaritalStatus: "First Marriage",
   Horoscope: "Sutham",

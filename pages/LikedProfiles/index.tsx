@@ -2,7 +2,7 @@ import BottomTabBar from "@/components/BottomTabBar";
 import FillImage from "@/components/FillImage";
 import { Profile } from "@/constants/SampleProfile";
 import { useLikedProfiles } from "@/context/LikedProfilesContext";
-import { nameWithAge } from "@/utils/profile";
+import { nameWithAge, primaryPhoto } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -21,11 +21,15 @@ export default function LikedProfiles() {
         onPress={() => navigation.navigate("ProfileDetails", { profile: item })}
       >
         <Feather name="user" size={48} color="rgba(255,255,255,0.6)" />
-        <FillImage source={item.photo} />
+        <FillImage source={primaryPhoto(item)} />
         <View pointerEvents="none" style={styles.gradient} />
 
         <View style={styles.cardTop}>
-          <TouchableOpacity style={styles.heartBtn} onPress={() => unlike(item.id)} hitSlop={6}>
+          <TouchableOpacity
+            style={styles.heartBtn}
+            onPress={() => unlike(item.id)}
+            hitSlop={6}
+          >
             <Ionicons name="heart" size={18} color={COLORS.red} />
           </TouchableOpacity>
         </View>
@@ -52,7 +56,9 @@ export default function LikedProfiles() {
       <View style={styles.header}>
         <Text style={styles.title}>Liked profiles</Text>
         <Text style={styles.subtitle}>
-          {liked.length === 1 ? "1 profile you liked" : `${liked.length} profiles you liked`}
+          {liked.length === 1
+            ? "1 profile you liked"
+            : `${liked.length} profiles you liked`}
         </Text>
       </View>
 
@@ -63,7 +69,10 @@ export default function LikedProfiles() {
           <Text style={styles.emptyText}>
             Tap the heart on a profile&apos;s details to see it here.
           </Text>
-          <TouchableOpacity style={styles.discoverBtn} onPress={() => navigation.navigate("Home")}>
+          <TouchableOpacity
+            style={styles.discoverBtn}
+            onPress={() => navigation.navigate("Home")}
+          >
             <Text style={styles.discoverText}>Discover profiles</Text>
           </TouchableOpacity>
         </View>

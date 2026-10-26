@@ -2,19 +2,19 @@ import { scaleFont } from "@/constants/ScaleFont";
 import { StyleSheet } from "react-native";
 
 export const COLORS = {
-  primary: "#12B34A",
-  primaryDark: "#0C8A36",
-  primaryLight: "#E7F8EC",
+  primary: "#0B9A0B",
+  primaryDark: "#087A08",
+  primaryLight: "#E6F5E6",
   red: "#F42626",
   high: "#E23B3B",
   highBg: "#FDECEC",
-  low: "#8E8E8E",
-  lowBg: "#F2F2F2",
+  low: "#2F80ED",
+  lowBg: "#EAF2FD",
   text: "#1A1A1A",
   muted: "#8A8A8A",
   border: "#ECECEC",
   white: "#FFFFFF",
-  canvas: "#F4FBF6",
+  canvas: "#ffffff",
 };
 
 export const styles = StyleSheet.create({
@@ -123,31 +123,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: scaleFont(20),
     marginTop: scaleFont(16),
     marginBottom: scaleFont(8),
-    gap: scaleFont(10),
-  },
-  pill: {
-    paddingHorizontal: scaleFont(16),
-    paddingVertical: scaleFont(8),
-    borderRadius: scaleFont(20),
-    borderWidth: 1.5,
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
-  },
-  pillOn: {
-    backgroundColor: COLORS.primary,
-  },
-  pillText: {
-    fontSize: scaleFont(13),
-    fontWeight: "700",
-    color: COLORS.primary,
-  },
-  pillTextOn: {
-    color: COLORS.white,
+    gap: scaleFont(8),
   },
   list: {
     paddingHorizontal: scaleFont(20),
     paddingTop: scaleFont(6),
-    paddingBottom: scaleFont(110),
+    paddingBottom: scaleFont(4),
   },
   card: {
     flexDirection: "row",
@@ -159,6 +140,12 @@ export const styles = StyleSheet.create({
     paddingLeft: scaleFont(16),
     marginBottom: scaleFont(12),
     overflow: "hidden",
+    borderLeftWidth: 3,
+    shadowColor: "#0F1C0F",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
   },
   accent: {
     position: "absolute",
@@ -235,8 +222,8 @@ export const styles = StyleSheet.create({
     position: "absolute",
     right: scaleFont(20),
     bottom: scaleFont(22),
-    width: scaleFont(58),
-    height: scaleFont(58),
+    width: scaleFont(48),
+    height: scaleFont(48),
     borderRadius: scaleFont(29),
     backgroundColor: COLORS.red,
     alignItems: "center",

@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native";
 export { COLORS };
 
 const SCREEN_BG = "#F4F7F5";
+const CANVAS_BG = "#ffffff";
 const SOFT_SHADOW = {
   shadowColor: "#0B3D2E",
   shadowOpacity: 0.08,
@@ -29,7 +30,7 @@ export const AVATAR_TINTS: { bg: string; fg: string }[] = [
 export const listStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: SCREEN_BG,
+    backgroundColor: CANVAS_BG,
   },
   safe: {
     flex: 1,
@@ -81,7 +82,7 @@ export const listStyles = StyleSheet.create({
     alignItems: "center",
     gap: scaleFont(10),
     marginHorizontal: scaleFont(20),
-    marginTop: scaleFont(18),
+    marginTop: scaleFont(10),
     paddingHorizontal: scaleFont(16),
     borderRadius: scaleFont(26),
     backgroundColor: COLORS.white,
@@ -306,7 +307,7 @@ export const listStyles = StyleSheet.create({
 export const chatStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: SCREEN_BG,
+    backgroundColor: CANVAS_BG,
   },
   safe: {
     flex: 1,
@@ -316,7 +317,7 @@ export const chatStyles = StyleSheet.create({
   },
   chatBg: {
     flex: 1,
-    backgroundColor: SCREEN_BG,
+    backgroundColor: CANVAS_BG,
     borderTopLeftRadius: scaleFont(28),
     borderTopRightRadius: scaleFont(28),
     overflow: "hidden",
@@ -327,9 +328,9 @@ export const chatStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: scaleFont(16),
-    paddingTop: scaleFont(14),
-    paddingBottom: scaleFont(18),
+    paddingHorizontal: scaleFont(10),
+    paddingTop: scaleFont(10),
+    paddingBottom: scaleFont(10),
     backgroundColor: COLORS.white,
   },
   headerLeft: {

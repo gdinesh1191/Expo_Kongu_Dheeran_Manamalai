@@ -7,7 +7,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const TABS = [
   { key: "Home", icon: "home", route: "Home" },
-  { key: "Profiles", icon: "users", route: "Search" },
+  { key: "Profiles", icon: "users", route: "Profile" },
   { key: "Wish List", icon: "heart", route: "LikedProfiles" },
   { key: "My Profile", icon: "user", route: "MyProfile" },
 ] as const;
@@ -30,9 +30,15 @@ export default function BottomTabBar({ active }: { active: TabKey }) {
             }}
           >
             <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
-              <Feather name={tab.icon} size={20} color={isActive ? COLORS.primary : COLORS.muted} />
+              <Feather
+                name={tab.icon}
+                size={20}
+                color={isActive ? COLORS.primary : COLORS.muted}
+              />
             </View>
-            <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{tab.key}</Text>
+            <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+              {tab.key}
+            </Text>
           </TouchableOpacity>
         );
       })}
@@ -47,7 +53,7 @@ const styles = StyleSheet.create({
     borderTopColor: COLORS.border,
     backgroundColor: COLORS.white,
     paddingTop: scaleFont(10),
-    paddingBottom: scaleFont(12),
+    paddingBottom: scaleFont(10),
   },
   tabItem: {
     flex: 1,

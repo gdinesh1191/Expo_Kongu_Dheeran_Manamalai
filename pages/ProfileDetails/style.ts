@@ -17,7 +17,6 @@ export const styles = StyleSheet.create({
   hero: {
     height: HERO_HEIGHT,
     backgroundColor: COLORS.primary,
-    overflow: "hidden",
   },
  
   avatarWrap: {
@@ -54,13 +53,41 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  thumbs: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: SHEET_OVERLAP + scaleFont(12),
+  },
+  thumbsContent: {
+    paddingHorizontal: scaleFont(16),
+    gap: scaleFont(8),
+  },
+  thumb: {
+    width: scaleFont(52),
+    height: scaleFont(64),
+    borderRadius: scaleFont(10),
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "transparent",
+    backgroundColor: "rgba(255,255,255,0.35)",
+  },
+  thumbActive: {
+    borderColor: COLORS.white,
+  },
+  thumbImage: {
+    width: "100%",
+    height: "100%",
+  },
 
   // Sheet
   sheet: {
     marginTop: -SHEET_OVERLAP,
+    zIndex: 2,
     backgroundColor: COLORS.white,
     borderTopLeftRadius: scaleFont(28),
     borderTopRightRadius: scaleFont(28),
+    overflow: "hidden",
     paddingHorizontal: scaleFont(20),
     paddingTop: scaleFont(24),
     paddingBottom: scaleFont(24),
