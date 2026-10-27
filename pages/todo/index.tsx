@@ -13,7 +13,6 @@ import {
   Pressable,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { COLORS, styles } from "./style";
@@ -379,16 +378,13 @@ export default function TodoPage() {
               style={[styles.card, { borderLeftColor: accentColor(item) }]}
               onLongPress={() => confirmDelete(item)}
             >
-              {/* <View
-                style={[styles.accent, { backgroundColor: accentColor(item) }]}
-              /> */}
               <Pressable
                 style={[styles.check, item.done && styles.checkOn]}
                 onPress={() => toggleTodo(item.id)}
                 hitSlop={8}
               >
                 {item.done ? (
-                  <Feather name="check" size={14} color={COLORS.white} />
+                  <Feather name="check" size={14} color={COLORS.primary} />
                 ) : null}
               </Pressable>
               <View style={styles.cardBody}>
@@ -419,13 +415,9 @@ export default function TodoPage() {
         }}
       />
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={openCreate}
-        activeOpacity={0.85}
-      >
+      <Pressable style={styles.fab} onPress={openCreate}>
         <Feather name="plus" size={scaleFont(26)} color={COLORS.white} />
-      </TouchableOpacity>
+      </Pressable>
 
       <Modal
         visible={modalOpen}
@@ -497,12 +489,12 @@ export default function TodoPage() {
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
             <View style={styles.actions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={closeCreate}>
+              <Pressable style={styles.cancelBtn} onPress={closeCreate}>
                 <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={addTodo}>
+              </Pressable>
+              <Pressable style={styles.saveBtn} onPress={addTodo}>
                 <Text style={styles.saveText}>Add task</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </KeyboardAvoidingView>

@@ -16,9 +16,9 @@ import {
   Alert,
   Dimensions,
   Image,
+  Pressable,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -305,9 +305,8 @@ export default function ProfileDetails() {
                     const source = imageSource(photo);
                     if (!source) return null;
                     return (
-                      <TouchableOpacity
+                      <Pressable
                         key={index}
-                        activeOpacity={0.85}
                         onPress={() => selectPhoto(index)}
                         style={[
                           styles.thumb,
@@ -315,17 +314,17 @@ export default function ProfileDetails() {
                         ]}
                       >
                         <Image source={source} style={styles.thumbImage} />
-                      </TouchableOpacity>
+                      </Pressable>
                     );
                   })}
                 </ScrollView>
               )}
 
               <View style={styles.heroTopRow}>
-                <TouchableOpacity style={styles.heroBtn} onPress={goBack}>
+                <Pressable style={styles.heroBtn} onPress={goBack}>
                   <Feather name="chevron-left" size={22} color={COLORS.red} />
-                </TouchableOpacity>
-                <TouchableOpacity
+                </Pressable>
+                <Pressable
                   style={styles.heroBtn}
                   onPress={() => toggleLike(profile)}
                 >
@@ -334,7 +333,7 @@ export default function ProfileDetails() {
                     size={22}
                     color={COLORS.red}
                   />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
 
@@ -360,10 +359,9 @@ export default function ProfileDetails() {
 
         {/* Footer actions */}
         <View style={styles.footer}>
-          <TouchableOpacity
+          <Pressable
             style={[styles.wishlistBtn, liked && styles.wishlistBtnActive]}
             onPress={() => toggleLike(profile)}
-            activeOpacity={0.85}
           >
             <Ionicons
               name={liked ? "heart" : "heart-outline"}
@@ -375,15 +373,11 @@ export default function ProfileDetails() {
             >
               {liked ? "Wishlisted" : "Wishlist"}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.interestBtn}
-            onPress={handleDownload}
-            activeOpacity={0.85}
-          >
+          </Pressable>
+          <Pressable style={styles.interestBtn} onPress={handleDownload}>
             <Feather name="download" size={18} color={COLORS.red} />
             <Text style={styles.interestText}>Download Profile</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <HoroscopeViewer

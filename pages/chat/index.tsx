@@ -12,9 +12,9 @@ import {
   ImageBackground,
   Keyboard,
   Platform,
+  Pressable,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import RemixIcon from "react-native-remix-icon";
@@ -167,10 +167,9 @@ function ContactCard({
   const tint = tintFor(item.id);
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[listStyles.card, hasUnread && listStyles.cardUnread]}
       onPress={onPress}
-      activeOpacity={0.85}
     >
       <View>
         <View style={[listStyles.avatar, { backgroundColor: tint.bg }]}>
@@ -211,7 +210,7 @@ function ContactCard({
           )}
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -263,10 +262,10 @@ function PeopleList({
               : "You're all caught up"}
           </Text>
         </View>
-        <TouchableOpacity style={listStyles.roundBtn} activeOpacity={0.8}>
+        <Pressable style={listStyles.roundBtn} >
           <RemixIcon name="notification-3-line" size={20} color={COLORS.text} />
           {unreadTotal > 0 && <View style={listStyles.bellDot} />}
-        </TouchableOpacity>
+        </Pressable>
       </View> */}
 
       {/* Search */}
@@ -280,9 +279,9 @@ function PeopleList({
           placeholderTextColor={COLORS.muted}
         />
         {query.length > 0 && (
-          <TouchableOpacity onPress={() => setQuery("")}>
+          <Pressable onPress={() => setQuery("")}>
             <RemixIcon name="close-line" size={18} color={COLORS.muted} />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
@@ -299,10 +298,9 @@ function PeopleList({
             renderItem={({ item }) => {
               const tint = tintFor(item.id);
               return (
-                <TouchableOpacity
+                <Pressable
                   style={listStyles.onlineItem}
                   onPress={() => onOpen(item)}
-                  activeOpacity={0.8}
                 >
                   <View style={listStyles.onlineRing}>
                     <View
@@ -319,7 +317,7 @@ function PeopleList({
                   <Text style={listStyles.onlineName} numberOfLines={1}>
                     {item.name}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             }}
           />
@@ -460,13 +458,9 @@ function ChatRoom({
       {/* Header */}
       <View style={chatStyles.header}>
         <View style={chatStyles.headerLeft}>
-          <TouchableOpacity
-            style={chatStyles.roundBtn}
-            onPress={onBack}
-            activeOpacity={0.8}
-          >
+          <Pressable style={chatStyles.roundBtn} onPress={onBack}>
             <RemixIcon name="arrow-left-line" size={20} color={COLORS.text} />
-          </TouchableOpacity>
+          </Pressable>
 
           <View>
             <View style={[chatStyles.avatar, { backgroundColor: tint.bg }]}>
@@ -521,9 +515,9 @@ function ChatRoom({
 
           {/* Floating input bar */}
           <View style={chatStyles.inputBar}>
-            <TouchableOpacity style={chatStyles.attachBtn} activeOpacity={0.8}>
+            <Pressable style={chatStyles.attachBtn}>
               <RemixIcon name="attachment-2" size={19} color={COLORS.primary} />
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={chatStyles.inputWrap}>
               <TextInput
@@ -536,21 +530,20 @@ function ChatRoom({
               />
             </View>
 
-            <TouchableOpacity
+            <Pressable
               style={[
                 chatStyles.sendBtn,
                 !canSend && chatStyles.sendBtnDisabled,
               ]}
               onPress={() => send(draft)}
               disabled={!canSend}
-              activeOpacity={0.85}
             >
               <RemixIcon
                 name="send-plane-fill"
                 size={18}
                 color={COLORS.white}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </ImageBackground>
       </View>

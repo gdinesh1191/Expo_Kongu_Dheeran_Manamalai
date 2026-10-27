@@ -1,3 +1,5 @@
+import LogoutModal from "@/components/LogoutModal";
+import { useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -34,8 +36,10 @@ export default function SidebarModalContent({
     }
   };
 
+  const [logoutOpen, setLogoutOpen] = useState(false);
+
   const handleLogout = () => {
-    // signOut();
+    setLogoutOpen(true);
   };
 
   return (
@@ -153,6 +157,8 @@ export default function SidebarModalContent({
           </Pressable>
         </View>
       </Animated.View>
+
+      <LogoutModal visible={logoutOpen} onCancel={() => setLogoutOpen(false)} />
     </>
   );
 }

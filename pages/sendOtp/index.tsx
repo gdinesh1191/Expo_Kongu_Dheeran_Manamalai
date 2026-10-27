@@ -1,13 +1,7 @@
 import OtpScreenShell from "@/components/OtpScreenShell";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import RemixIcon from "react-native-remix-icon";
 
 const CONTACTS = {
@@ -21,6 +15,7 @@ export default function SendOtpPage() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const role = route.params?.role ?? "user";
+  const Route = route.params?.route ?? "Home";
   const [channel, setChannel] = useState<Channel>("phone");
 
   const onSend = () => {
@@ -28,6 +23,7 @@ export default function SendOtpPage() {
       channel,
       masked: CONTACTS[channel],
       role,
+      route: Route,
     });
   };
 
@@ -53,13 +49,9 @@ export default function SendOtpPage() {
         onPress={() => setChannel("phone")}
       />
 
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={onSend}
-        style={styles.button}
-      >
+      <Pressable onPress={onSend} style={styles.button}>
         <Text style={styles.buttonText}>Send OTP</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       <Pressable
         onPress={() => navigation.navigate("Login")}

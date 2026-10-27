@@ -1,17 +1,20 @@
+import { useAuth } from "@/app/AuthContext";
 import BottomTabBar from "@/components/BottomTabBar";
 import FillImage from "@/components/FillImage";
 import { FEED_POSTS, FeedPost } from "@/constants/FeedPosts";
 import { MY_PROFILE } from "@/constants/SampleProfile";
 import { primaryPhoto } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
 import {
   FlatList,
+  Image,
+  Pressable,
   RefreshControl,
   Text,
-  TouchableOpacity,
   View,
-  ViewToken,
+  ViewToken
 } from "react-native";
 import FeedPostCard from "./FeedPost";
 import { COLORS, styles } from "./style";
@@ -21,7 +24,8 @@ const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 export default function Home() {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-
+  const { token } = useAuth();
+  const navigation = useNavigation<any>();
   async function onRefresh() {
     setRefreshing(true);
     setPlayingId(null);
@@ -51,25 +55,47 @@ export default function Home() {
       <View style={styles.feedHeader}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <View style={styles.headerAvatar}>
-              <Feather name="user" size={20} color="rgba(255,255,255,0.85)" />
-              <FillImage source={primaryPhoto(MY_PROFILE)} />
-            </View>
+            {token !== null ? (
+              <View style={styles.headerAvatar}>
+                <Feather name="user" size={20} color="rgba(255,255,255,0.85)" />
+
+                <FillImage source={primaryPhoto(MY_PROFILE)} />
+              </View>
+            ) : (
+              <Image
+                source={require("../../assets/Images/Logo_bg.png")}
+                style={styles.postAvatar}
+                resizeMode="contain"
+              />
+            )}
             <View>
               <Text style={styles.userName} numberOfLines={1}>
-                {MY_PROFILE.name}
+                {token !== null ? MY_PROFILE.name : "Kongu Dheeran Manamalai"}
               </Text>
-              <Text style={styles.greeting}>Reg No: {MY_PROFILE.id}</Text>
+              {token !== null ? (
+                <Text style={styles.greeting}>Reg No: {MY_PROFILE.id}</Text>
+              ) : (
+                <Text style={styles.greeting}>Find Your Perfect Match</Text>
+              )}
             </View>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconBtn}>
-              <Ionicons
-                name="notifications-outline"
-                size={20}
-                color={COLORS.red}
-              />
-            </TouchableOpacity>
+            {token !== null ? (
+              <Pressable style={styles.iconBtn}>
+                <Ionicons
+                  name="notifications-outline"
+                  size={20}
+                  color={COLORS.red}
+                />
+              </Pressable>
+            ) : (
+              <Pressable
+                style={styles.loginBtn}
+                onPress={() => navigation.navigate("Login")}
+              >
+                <Text style={styles.loginText}>Login</Text>
+              </Pressable>
+            )}
           </View>
         </View>
       </View>

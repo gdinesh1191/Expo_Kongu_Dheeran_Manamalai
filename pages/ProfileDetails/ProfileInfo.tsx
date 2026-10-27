@@ -2,7 +2,7 @@ import { Profile } from "@/constants/SampleProfile";
 import { Detail, clean, details } from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { COLORS, styles } from "./style";
 
 type FeatherIcon = React.ComponentProps<typeof Feather>["name"];
@@ -83,11 +83,7 @@ function CardSubTitle({ title }: { title: string }) {
 
 export function HoroscopeButton({ onPress }: { onPress: () => void }) {
   return (
-    <TouchableOpacity
-      style={styles.horoscopeBtn}
-      onPress={onPress}
-      activeOpacity={0.85}
-    >
+    <Pressable style={styles.horoscopeBtn} onPress={onPress}>
       <Feather name="book-open" size={18} color={COLORS.primary} />
       <Text style={styles.horoscopeBtnText}>View Full Horoscope</Text>
       <Feather
@@ -96,7 +92,7 @@ export function HoroscopeButton({ onPress }: { onPress: () => void }) {
         color={COLORS.primary}
         style={styles.horoscopeBtnChevron}
       />
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -157,8 +153,7 @@ export default function ProfileInfo({ profile }: { profile: Profile }) {
       <View style={styles.nameBlock}>
         <Text style={styles.name}>{profile.name}</Text>
         <Text style={styles.registerNo}>
-          Register No:{" "}
-          <Text style={styles.registerNoValue}>{profile.id}</Text>
+          Register No: <Text style={styles.registerNoValue}>{profile.id}</Text>
         </Text>
       </View>
 

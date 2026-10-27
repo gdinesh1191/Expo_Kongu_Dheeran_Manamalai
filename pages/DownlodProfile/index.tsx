@@ -1,32 +1,32 @@
 import HeroPhoto, { useHeroHeight } from "@/components/HeroPhoto";
 import {
-    ChipList,
-    DetailsGrid,
-    HoroscopeChart,
-    SectionTitle,
-    SubTitle,
+  ChipList,
+  DetailsGrid,
+  HoroscopeChart,
+  SectionTitle,
+  SubTitle,
 } from "@/components/ProfileSections";
 import { Profile, SAMPLE_PROFILES } from "@/constants/SampleProfile";
 import {
-    clean,
-    dasaBalanceText,
-    details,
-    educationText,
-    imageSource,
-    profilePhotos,
+  clean,
+  dasaBalanceText,
+  details,
+  educationText,
+  imageSource,
+  profilePhotos,
 } from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Image,
-    ScrollView,
-    Share,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  Switch,
+  Text,
+  View,
 } from "react-native";
 import { COLORS, SHEET_OVERLAP, styles } from "./style";
 
@@ -201,15 +201,15 @@ export default function DownlodProfile() {
           )}
 
           <View style={styles.heroTopRow}>
-            <TouchableOpacity
+            <Pressable
               style={styles.heroBtn}
               onPress={() => navigation.goBack()}
             >
               <Feather name="chevron-left" size={22} color={COLORS.red} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.heroBtn} onPress={handleShare}>
+            </Pressable>
+            <Pressable style={styles.heroBtn} onPress={handleShare}>
               <Feather name="share-2" size={20} color={COLORS.red} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {includePhoto && photos.length > 1 && (
@@ -224,9 +224,8 @@ export default function DownlodProfile() {
                   const source = imageSource(photo);
                   if (!source) return null;
                   return (
-                    <TouchableOpacity
+                    <Pressable
                       key={index}
-                      activeOpacity={0.85}
                       onPress={() => selectPhoto(index)}
                       style={[
                         styles.thumb,
@@ -234,7 +233,7 @@ export default function DownlodProfile() {
                       ]}
                     >
                       <Image source={source} style={styles.thumbImage} />
-                    </TouchableOpacity>
+                    </Pressable>
                   );
                 })}
               </ScrollView>
@@ -280,7 +279,7 @@ export default function DownlodProfile() {
             {FORMATS.map((item) => {
               const active = item.key === format;
               return (
-                <TouchableOpacity
+                <Pressable
                   key={item.key}
                   style={[
                     styles.formatOption,
@@ -301,7 +300,7 @@ export default function DownlodProfile() {
                   >
                     {item.key}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               );
             })}
           </View>
@@ -329,10 +328,10 @@ export default function DownlodProfile() {
 
       {/* Footer actions */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload}>
+        <Pressable style={styles.downloadBtn} onPress={handleDownload}>
           <Feather name="download" size={20} color={COLORS.white} />
           <Text style={styles.downloadText}>Download {format}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

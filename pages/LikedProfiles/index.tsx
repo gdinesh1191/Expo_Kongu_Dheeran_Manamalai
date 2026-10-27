@@ -6,7 +6,7 @@ import { primaryPhoto } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { COLORS, styles } from "./style";
 
 export default function LikedProfiles() {
@@ -15,9 +15,8 @@ export default function LikedProfiles() {
 
   function renderItem({ item }: { item: Profile }) {
     return (
-      <TouchableOpacity
+      <Pressable
         style={styles.card}
-        activeOpacity={0.9}
         onPress={() => navigation.navigate("ProfileDetails", { profile: item })}
       >
         <Feather name="user" size={48} color="rgba(255,255,255,0.6)" />
@@ -25,13 +24,13 @@ export default function LikedProfiles() {
         <View pointerEvents="none" style={styles.gradient} />
 
         <View style={styles.cardTop}>
-          <TouchableOpacity
+          <Pressable
             style={styles.heartBtn}
             onPress={() => unlike(item.id)}
             hitSlop={6}
           >
             <Ionicons name="heart" size={18} color={COLORS.red} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.cardInfo}>
@@ -47,7 +46,7 @@ export default function LikedProfiles() {
             {item.location}
           </Text>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
@@ -69,12 +68,12 @@ export default function LikedProfiles() {
           <Text style={styles.emptyText}>
             Tap the heart on a profile&apos;s details to see it here.
           </Text>
-          <TouchableOpacity
+          <Pressable
             style={styles.discoverBtn}
             onPress={() => navigation.navigate("Profile")}
           >
             <Text style={styles.discoverText}>Discover profiles</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ) : (
         <FlatList

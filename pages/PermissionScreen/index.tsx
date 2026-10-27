@@ -8,15 +8,14 @@ import {
   Linking,
   PermissionsAndroid,
   Platform,
+  Pressable,
   Text,
-  TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { styles } from "./style";
 
 export default function PermissionScreen() {
   const navigation = useNavigation<any>();
-
 
   //   useEffect(()=>{
   // checkPermission
@@ -55,8 +54,6 @@ export default function PermissionScreen() {
     }
   }
 
-  
-
   return (
     <ImageBackground
       source={require("../../assets/Images/permission.png")}
@@ -79,12 +76,9 @@ export default function PermissionScreen() {
           </Text>
         </View>
         <View style={{ marginTop: 40 }}>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={() => checkPermission()}
-          >
+          <Pressable style={styles.btn} onPress={() => checkPermission()}>
             <Text style={styles.btnText}>Allow</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </ImageBackground>

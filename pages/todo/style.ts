@@ -15,6 +15,7 @@ export const COLORS = {
   border: "#ECECEC",
   white: "#FFFFFF",
   canvas: "#ffffff",
+  gray: "#F3F4F6",
 };
 
 export const styles = StyleSheet.create({
@@ -53,34 +54,38 @@ export const styles = StyleSheet.create({
   progress: {
     marginHorizontal: scaleFont(20),
     marginTop: scaleFont(14),
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     borderRadius: scaleFont(22),
     paddingHorizontal: scaleFont(18),
     paddingVertical: scaleFont(16),
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: COLORS.primary,
   },
   progressLabel: {
     fontSize: scaleFont(13),
     fontWeight: "600",
-    color: "rgba(255,255,255,0.9)",
+    // color: "rgba(255,255,255,0.9)",
+    color: COLORS.text,
   },
   progressValue: {
     marginTop: scaleFont(4),
     fontSize: scaleFont(20),
     fontWeight: "800",
-    color: COLORS.white,
+    color: COLORS.text,
   },
   track: {
     marginTop: scaleFont(14),
     height: scaleFont(6),
     borderRadius: scaleFont(4),
-    backgroundColor: "rgba(255,255,255,0.35)",
+    // backgroundColor: "rgba(255,255,255,0.35)",
+    backgroundColor: COLORS.gray,
     overflow: "hidden",
   },
   fill: {
     height: "100%",
     borderRadius: scaleFont(4),
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.primary,
   },
   dayRow: {
     flexDirection: "row",
@@ -98,11 +103,11 @@ export const styles = StyleSheet.create({
     borderColor: "#F0F0F0",
   },
   dayChipOn: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     borderColor: COLORS.primary,
   },
   dayName: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "600",
     color: COLORS.muted,
   },
@@ -113,10 +118,10 @@ export const styles = StyleSheet.create({
     color: COLORS.text,
   },
   dayNameOn: {
-    color: COLORS.white,
+    color: COLORS.primary,
   },
   dayNumOn: {
-    color: COLORS.white,
+    color: COLORS.primary,
   },
   filters: {
     flexDirection: "row",
@@ -167,7 +172,7 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   checkOn: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.white,
   },
   cardBody: {
     flex: 1,
@@ -194,7 +199,7 @@ export const styles = StyleSheet.create({
     borderRadius: scaleFont(8),
   },
   badgeText: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(12),
     fontWeight: "700",
   },
   cardNote: {
@@ -228,11 +233,8 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.red,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 6,
-    shadowColor: COLORS.red,
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
+    borderWidth: 1.5,
+    borderColor: COLORS.red,
   },
   modalRoot: {
     flex: 1,
@@ -262,9 +264,9 @@ export const styles = StyleSheet.create({
     color: COLORS.muted,
   },
   label: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontWeight: "700",
-    color: COLORS.primaryDark,
+    color: "black",
     marginBottom: scaleFont(6),
   },
   input: {
@@ -297,7 +299,7 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.primaryLight,
   },
   priorityChipText: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontWeight: "700",
     color: COLORS.muted,
   },
@@ -314,13 +316,18 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: scaleFont(10),
     marginTop: scaleFont(4),
+    marginHorizontal: -scaleFont(20),
+    paddingHorizontal: scaleFont(20),
+    paddingTop: scaleFont(16),
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
   },
   cancelBtn: {
     flex: 1,
     height: scaleFont(48),
     borderRadius: scaleFont(14),
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.red,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: COLORS.white,
@@ -328,19 +335,20 @@ export const styles = StyleSheet.create({
   cancelText: {
     fontSize: scaleFont(15),
     fontWeight: "700",
-    color: COLORS.text,
+    color: COLORS.red,
   },
   saveBtn: {
-    flex: 1.4,
+    flex: 1,
     height: scaleFont(48),
     borderRadius: scaleFont(14),
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.primary,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
   },
   saveText: {
     fontSize: scaleFont(15),
     fontWeight: "700",
-    color: COLORS.white,
+    color: COLORS.primary,
   },
 });

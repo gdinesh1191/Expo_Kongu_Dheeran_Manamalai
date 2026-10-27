@@ -2,7 +2,7 @@ import HeaderContentNew from "@/components/HeaderContent/HeaderContentNew";
 import { Feather } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import React, { useEffect, useMemo, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { COLORS, STATUS_STYLE, styles, THEME } from "./style";
 
@@ -193,11 +193,7 @@ function HistoryTab() {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.monthBtn}
-          onPress={() => setOpen((v) => !v)}
-          activeOpacity={0.8}
-        >
+        <Pressable style={styles.monthBtn} onPress={() => setOpen((v) => !v)}>
           <Feather name="calendar" size={15} color={THEME.text} />
           <Text style={styles.monthText}>{current.label}</Text>
           <Feather
@@ -205,12 +201,12 @@ function HistoryTab() {
             size={15}
             color={THEME.text}
           />
-        </TouchableOpacity>
+        </Pressable>
 
         {open && (
           <View style={styles.monthMenu}>
             {months.map((m, i) => (
-              <TouchableOpacity
+              <Pressable
                 key={m.label}
                 style={[
                   styles.monthMenuItem,
@@ -222,7 +218,7 @@ function HistoryTab() {
                 }}
               >
                 <Text style={styles.monthMenuText}>{m.label}</Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         )}
@@ -340,11 +336,7 @@ function PunchTab() {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.punchBtn}
-        onPress={onPunch}
-        activeOpacity={0.85}
-      >
+      <Pressable style={styles.punchBtn} onPress={onPunch}>
         <Feather
           name={punchedIn ? "log-out" : "log-in"}
           size={18}
@@ -353,7 +345,7 @@ function PunchTab() {
         <Text style={styles.punchBtnText}>
           {punchedIn ? "Punch Out" : "Punch In"}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
@@ -380,18 +372,17 @@ export default function Attendance() {
             { key: "punch", label: "Punch" },
           ] as { key: TabKey; label: string }[]
         ).map((t) => (
-          <TouchableOpacity
+          <Pressable
             key={t.key}
             style={[styles.tab, tab === t.key && styles.tabActive]}
             onPress={() => setTab(t.key)}
-            activeOpacity={0.85}
           >
             <Text
               style={[styles.tabText, tab === t.key && styles.tabTextActive]}
             >
               {t.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 

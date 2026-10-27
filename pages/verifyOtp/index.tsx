@@ -1,22 +1,18 @@
+import { useAuth } from "@/app/AuthContext";
 import OtpScreenShell from "@/components/OtpScreenShell";
 import { DUMMY_OTP } from "@/constants/DummyAuth";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useRef, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 const LENGTH = 4;
 
 export default function VerifyOtpPage() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const { login } = useAuth();
   const masked = route.params?.masked ?? "*****0467";
-
+  const Route = route.params?.route ?? "Home";
   const inputs = useRef<Array<TextInput | null>>([]);
   const [digits, setDigits] = useState<string[]>(Array(LENGTH).fill(""));
   const [error, setError] = useState("");
@@ -66,7 +62,11 @@ export default function VerifyOtpPage() {
       focusAt(0);
       return;
     }
-    navigation.reset({ index: 0, routes: [{ name: "Home", params: { role: "user" } }] });
+    login("user");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: Route, params: { role: "user" } }],
+    });
   };
 
   const onResend = () => {
@@ -107,13 +107,9 @@ export default function VerifyOtpPage() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={onVerify}
-        style={styles.button}
-      >
+      <Pressable onPress={onVerify} style={styles.button}>
         <Text style={styles.buttonText}>Verify OTP</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       <Text style={styles.resendRow}>
         Didn't receive OTP?{" "}

@@ -4,14 +4,13 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-    FlatList,
-    Modal,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -481,11 +480,10 @@ export default function FilterPage() {
   function renderChip(key: ListKey, value: string, single?: boolean) {
     const active = filters[key].includes(value);
     return (
-      <TouchableOpacity
+      <Pressable
         key={value}
         style={[styles.chip, active && styles.chipActive]}
         onPress={() => toggle(key, value, single)}
-        activeOpacity={0.8}
       >
         {active ? (
           <Feather name="check" size={14} color={COLORS.primaryDark} />
@@ -493,7 +491,7 @@ export default function FilterPage() {
         <Text style={[styles.chipText, active && styles.chipTextActive]}>
           {value}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
@@ -510,22 +508,21 @@ export default function FilterPage() {
       <View style={styles.cardBody}>
         <View style={styles.labelRow}>
           <Text style={styles.groupLabel}>{section.checkboxLabel}</Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() => selectAll(section.key, section.options)}
             hitSlop={8}
           >
             <Text style={styles.selectAll}>Select all</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <View style={styles.checkGrid}>
           {options.map((o) => {
             const checked = values.includes(o);
             return (
-              <TouchableOpacity
+              <Pressable
                 key={o}
                 style={styles.checkItem}
                 onPress={() => toggle(section.key, o)}
-                activeOpacity={0.7}
               >
                 <View
                   style={[styles.checkBox, checked && styles.checkBoxActive]}
@@ -537,12 +534,12 @@ export default function FilterPage() {
                 <Text style={styles.checkText} numberOfLines={2}>
                   {o}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             );
           })}
         </View>
         {hidden > 0 ? (
-          <TouchableOpacity
+          <Pressable
             onPress={() =>
               setShowAll((s) => ({ ...s, [section.key]: !expandedList }))
             }
@@ -551,7 +548,7 @@ export default function FilterPage() {
             <Text style={styles.moreText}>
               {expandedList ? "Show less" : `+ ${hidden} more`}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ) : null}
       </View>
     );
@@ -562,10 +559,9 @@ export default function FilterPage() {
     const values = filters[section.key];
     return (
       <View key={section.key} style={[styles.card, open && styles.cardActive]}>
-        <TouchableOpacity
+        <Pressable
           style={styles.cardHeader}
           onPress={() => setExpanded(open ? null : section.key)}
-          activeOpacity={0.8}
         >
           <View style={styles.cardIcon}>{section.icon}</View>
           <View style={styles.cardTitleWrap}>
@@ -584,7 +580,7 @@ export default function FilterPage() {
             size={18}
             color={COLORS.text}
           />
-        </TouchableOpacity>
+        </Pressable>
 
         {open && section.checkboxLabel ? (
           renderCheckboxGrid(section)
@@ -604,19 +600,16 @@ export default function FilterPage() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.closeBtn}
-          onPress={() => navigation.goBack()}
-        >
+        <Pressable style={styles.closeBtn} onPress={() => navigation.goBack()}>
           <Feather name="x" size={20} color={COLORS.text} />
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.headerCenter}>
           <Text style={styles.title}>Filters</Text>
           <Text style={styles.subtitle}>{applied.length} applied</Text>
         </View>
-        <TouchableOpacity onPress={() => setFilters(EMPTY)} hitSlop={8}>
+        <Pressable onPress={() => setFilters(EMPTY)} hitSlop={8}>
           <Text style={styles.resetText}>Reset</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {applied.length > 0 ? (
@@ -627,15 +620,14 @@ export default function FilterPage() {
             contentContainerStyle={styles.appliedContent}
           >
             {applied.map((chip) => (
-              <TouchableOpacity
+              <Pressable
                 key={chip.id}
                 style={styles.appliedChip}
                 onPress={chip.remove}
-                activeOpacity={0.8}
               >
                 <Text style={styles.appliedChipText}>{chip.label}</Text>
                 <Feather name="x" size={13} color={COLORS.primaryDark} />
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </ScrollView>
         </View>
@@ -663,10 +655,9 @@ export default function FilterPage() {
           {renderSection(AVOID_SECTION)}
 
           <View style={[styles.card, basicOpen && styles.cardActive]}>
-            <TouchableOpacity
+            <Pressable
               style={styles.cardHeader}
               onPress={() => setExpanded(basicOpen ? null : "basic")}
-              activeOpacity={0.8}
             >
               <View style={styles.cardIcon}>
                 <Feather name="user" size={18} color={COLORS.primary} />
@@ -679,7 +670,7 @@ export default function FilterPage() {
                 size={18}
                 color={COLORS.text}
               />
-            </TouchableOpacity>
+            </Pressable>
 
             {basicOpen ? (
               <View style={styles.cardBody}>
@@ -714,12 +705,12 @@ export default function FilterPage() {
 
                 <View style={[styles.labelRow, styles.fieldGap]}>
                   <Text style={styles.label}>Complexion</Text>
-                  <TouchableOpacity
+                  <Pressable
                     onPress={() => selectAll("complexion", COMPLEXIONS)}
                     hitSlop={8}
                   >
                     <Text style={styles.selectAll}>Select all</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
                 <View style={styles.chipsWrap}>
                   {COMPLEXIONS.map((c) => renderChip("complexion", c))}
@@ -762,19 +753,12 @@ export default function FilterPage() {
       </KeyboardAwareScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.footerReset}
-          onPress={() => setFilters(EMPTY)}
-        >
+        <Pressable style={styles.footerReset} onPress={() => setFilters(EMPTY)}>
           <Text style={styles.footerResetText}>Reset</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.showBtn}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.85}
-        >
+        </Pressable>
+        <Pressable style={styles.showBtn} onPress={() => navigation.goBack()}>
           <Text style={styles.showBtnText}>Apply</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <Modal
@@ -813,7 +797,7 @@ export default function FilterPage() {
                   index ===
                   (picker === "to" ? filters.heightTo : filters.heightFrom);
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     style={[styles.modalItem, { height: 48 }]}
                     onPress={() => pickHeight(index)}
                   >
@@ -828,7 +812,7 @@ export default function FilterPage() {
                     {selected ? (
                       <Feather name="check" size={18} color={COLORS.primary} />
                     ) : null}
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               }}
             />
@@ -847,16 +831,12 @@ function HeightDropdown({
   onPress: () => void;
 }) {
   return (
-    <TouchableOpacity
-      style={styles.dropdown}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
+    <Pressable style={styles.dropdown} onPress={onPress}>
       <Text style={styles.dropdownText}>{value}</Text>
       <View style={styles.dropdownIcon}>
         <Feather name="chevron-down" size={14} color={COLORS.primary} />
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

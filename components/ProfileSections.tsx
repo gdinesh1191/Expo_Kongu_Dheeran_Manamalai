@@ -18,7 +18,6 @@ import {
   StyleProp,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   ViewStyle,
   useWindowDimensions,
@@ -108,8 +107,7 @@ export function HoroscopeChart({
 
   return (
     <>
-      <TouchableOpacity
-        activeOpacity={0.85}
+      <Pressable
         onPress={() => setOpen(true)}
         style={[styles.chartWrap, { aspectRatio: ratio }]}
       >
@@ -118,7 +116,7 @@ export function HoroscopeChart({
           <Feather name="maximize-2" size={12} color={COLORS.white} />
           <Text style={styles.chartHintText}>Tap to enlarge</Text>
         </View>
-      </TouchableOpacity>
+      </Pressable>
 
       <HoroscopeViewer
         source={source}

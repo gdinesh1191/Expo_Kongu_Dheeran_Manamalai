@@ -1,11 +1,10 @@
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   CommonActions,
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  ThemeProvider
+  ThemeProvider,
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
@@ -13,7 +12,11 @@ import { Text, TextInput, useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { LogLevel, OneSignal } from "react-native-onesignal";
 import "react-native-reanimated";
-import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { AuthProvider } from "./app/AuthContext";
 import MainNavigator from "./app/MainNavigator";
 import { LikedProfilesProvider } from "./context/LikedProfilesContext";
 
@@ -25,19 +28,18 @@ import { LikedProfilesProvider } from "./context/LikedProfilesContext";
 if ((Text as any).defaultProps == null) (Text as any).defaultProps = {};
 (Text as any).defaultProps.allowFontScaling = false;
 (Text as any).defaultProps.maxFontSizeMultiplier = 1;
-if ((TextInput as any).defaultProps == null) (TextInput as any).defaultProps = {};
+if ((TextInput as any).defaultProps == null)
+  (TextInput as any).defaultProps = {};
 (TextInput as any).defaultProps.allowFontScaling = false;
 (TextInput as any).defaultProps.maxFontSizeMultiplier = 1;
 
 export default function RootLayout() {
-
   return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <SafeAreaProvider>
-            <Root />
-          </SafeAreaProvider>
-        </GestureHandlerRootView>
-    
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <Root />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -53,11 +55,11 @@ function Root() {
     OneSignal.User.pushSubscription
       .getIdAsync()
       .then((subscriptionId: any) => {
-        AsyncStorage.setItem('subscriptionId', subscriptionId);
+        AsyncStorage.setItem("subscriptionId", subscriptionId);
         // You can use this ID to identify the user or send it to your server
       })
-      .catch(error => {
-        console.log('Failed to get subscription ID:', error);
+      .catch((error) => {
+        console.log("Failed to get subscription ID:", error);
       });
     OneSignal.Notifications.addEventListener("click", (event: any) => {
       const navigationData = event.notification.additionalData.navigation;
@@ -79,7 +81,7 @@ function Root() {
     userId: any,
     sessionId: any,
     URL: any,
-    Name: any
+    Name: any,
   ) => {
     const navigation = navigationRef.current;
     if (navigation) {
@@ -95,17 +97,19 @@ function Root() {
     }
   };
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <View style={{ flex: 1 }}>
-        <View style={{  backgroundColor: '#0B9A0B', height:insets.top }} />
-        <StatusBar style="light" />
-        <LikedProfilesProvider>
-          <NavigationContainer>
-            <MainNavigator />
-          </NavigationContainer>
-        </LikedProfilesProvider>
-        <View style={{height:insets.bottom }} />
-      </View>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <View style={{ flex: 1 }}>
+          <View style={{ backgroundColor: "#0B9A0B", height: insets.top }} />
+          <StatusBar style="light" />
+          <LikedProfilesProvider>
+            <NavigationContainer>
+              <MainNavigator />
+            </NavigationContainer>
+          </LikedProfilesProvider>
+          <View style={{ height: insets.bottom }} />
+        </View>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

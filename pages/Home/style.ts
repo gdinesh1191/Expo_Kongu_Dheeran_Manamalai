@@ -346,7 +346,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F3F6F3",
   },
   feedHeader: {
-    paddingHorizontal: scaleFont(18),
+    paddingHorizontal: scaleFont(15),
     paddingBottom: scaleFont(10),
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
@@ -458,5 +458,23 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.55)",
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  loginBtn: {
+    height: scaleFont(35),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    borderColor: COLORS.red,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scaleFont(6),
+    paddingHorizontal: scaleFont(8),
+  },
+  loginText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: COLORS.red,
   },
 });

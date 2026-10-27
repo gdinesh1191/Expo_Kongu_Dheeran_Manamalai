@@ -1,7 +1,7 @@
 import { scaleFont } from "@/constants/ScaleFont";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   interpolate,
@@ -75,18 +75,27 @@ export default function SwipeGuideModal({
     const reset = (to: number) => withTiming(to, { duration: 0 });
     tx.value = withSequence(
       reset(0),
-      withDelay(MOVE_DELAY, withTiming(target.x, { duration: MOVE_DURATION, easing })),
+      withDelay(
+        MOVE_DELAY,
+        withTiming(target.x, { duration: MOVE_DURATION, easing }),
+      ),
     );
     ty.value = withSequence(
       reset(0),
-      withDelay(MOVE_DELAY, withTiming(target.y, { duration: MOVE_DURATION, easing })),
+      withDelay(
+        MOVE_DELAY,
+        withTiming(target.y, { duration: MOVE_DURATION, easing }),
+      ),
     );
     opacity.value = withSequence(
       reset(1),
       withDelay(MOVE_DELAY + MOVE_DURATION, withTiming(0, { duration: 300 })),
     );
 
-    const timer = setTimeout(() => setStep((s) => (s + 1) % steps.length), STEP_DURATION);
+    const timer = setTimeout(
+      () => setStep((s) => (s + 1) % steps.length),
+      STEP_DURATION,
+    );
     return () => clearTimeout(timer);
   }, [step, visible, tx, ty, opacity, steps]);
 
@@ -107,7 +116,12 @@ export default function SwipeGuideModal({
   const current = steps[step];
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
           <Text style={styles.title}>{title}</Text>
@@ -119,15 +133,26 @@ export default function SwipeGuideModal({
               <View style={styles.miniHead} />
               <View style={styles.miniBody} />
             </Animated.View>
-            <Animated.View style={[styles.hand, handStyle]} pointerEvents="none">
-              <MaterialCommunityIcons name="hand-pointing-up" size={38} color={COLORS.red} />
+            <Animated.View
+              style={[styles.hand, handStyle]}
+              pointerEvents="none"
+            >
+              <MaterialCommunityIcons
+                name="hand-pointing-up"
+                size={38}
+                color={COLORS.red}
+              />
             </Animated.View>
           </View>
 
           {/* Current gesture */}
           <View style={styles.stepRow}>
             <View style={styles.stepIcon}>
-              <MaterialCommunityIcons name={current.icon} size={24} color={COLORS.primary} />
+              <MaterialCommunityIcons
+                name={current.icon}
+                size={24}
+                color={COLORS.primary}
+              />
             </View>
             <View style={styles.stepTextWrap}>
               <Text style={styles.stepTitle}>{current.title}</Text>
@@ -137,16 +162,16 @@ export default function SwipeGuideModal({
 
           <View style={styles.dots}>
             {steps.map((s, i) => (
-              <TouchableOpacity key={s.key} onPress={() => setStep(i)} hitSlop={8}>
+              <Pressable key={s.key} onPress={() => setStep(i)} hitSlop={8}>
                 <View style={[styles.dot, i === step && styles.dotActive]} />
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={onClose}>
+          <Pressable style={styles.button} onPress={onClose}>
             <Feather name="check" size={18} color={COLORS.white} />
             <Text style={styles.buttonText}>Got it</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </Modal>

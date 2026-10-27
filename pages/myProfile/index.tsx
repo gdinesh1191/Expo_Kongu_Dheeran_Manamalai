@@ -2,17 +2,12 @@ import BottomTabBar from "@/components/BottomTabBar";
 import HeroPhoto, { useHeroHeight } from "@/components/HeroPhoto";
 import { HoroscopeViewer } from "@/components/ProfileSections";
 import { MY_PROFILE } from "@/constants/SampleProfile";
+import { scaleFont } from "@/constants/ScaleFont";
 import { imageSource, profilePhotos } from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  Alert,
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import LogoutModal from "../../components/LogoutModal";
 import ProfileInfo, { HoroscopeButton } from "../ProfileDetails/ProfileInfo";
 import {
   COLORS,
@@ -27,13 +22,7 @@ export default function MyProfile() {
   const [horoscopeOpen, setHoroscopeOpen] = useState(false);
   const activePhoto = photos[activeIndex] ?? photos[0];
   const heroHeight = useHeroHeight(activePhoto, SHEET_OVERLAP);
-
-  function confirmLogout() {
-    Alert.alert("Log out", "Are you sure you want to log out?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Log out", style: "destructive", onPress: () => {} },
-    ]);
-  }
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
     <View style={detailStyles.container}>
@@ -62,9 +51,8 @@ export default function MyProfile() {
                 const source = imageSource(photo);
                 if (!source) return null;
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={index}
-                    activeOpacity={0.85}
                     onPress={() => setActiveIndex(index)}
                     style={[
                       detailStyles.thumb,
@@ -72,7 +60,7 @@ export default function MyProfile() {
                     ]}
                   >
                     <Image source={source} style={detailStyles.thumbImage} />
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </ScrollView>
@@ -86,26 +74,26 @@ export default function MyProfile() {
           {!!profile.horoscopeImage && (
             <HoroscopeButton onPress={() => setHoroscopeOpen(true)} />
           )}
+
+          <View style={{ flexDirection: "row", marginTop: scaleFont(16) }}>
+            <Pressable
+              style={detailStyles.interestBtn}
+              onPress={() => setLogoutOpen(true)}
+            >
+              <Feather name="log-out" size={18} color={COLORS.red} />
+              <Text style={detailStyles.interestText}>Log out</Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
-
-      {/* Footer actions */}
-      <View style={detailStyles.footer}>
-        <TouchableOpacity
-          style={detailStyles.interestBtn}
-          onPress={confirmLogout}
-          activeOpacity={0.85}
-        >
-          <Feather name="log-out" size={18} color={COLORS.red} />
-          <Text style={detailStyles.interestText}>Log out</Text>
-        </TouchableOpacity>
-      </View>
 
       <HoroscopeViewer
         source={profile.horoscopeImage}
         visible={horoscopeOpen}
         onClose={() => setHoroscopeOpen(false)}
       />
+
+      <LogoutModal visible={logoutOpen} onCancel={() => setLogoutOpen(false)} />
 
       <BottomTabBar active="My Profile" />
     </View>

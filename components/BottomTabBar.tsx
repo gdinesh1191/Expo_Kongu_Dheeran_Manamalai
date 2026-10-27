@@ -1,9 +1,10 @@
+import { useAuth } from "@/app/AuthContext";
 import { scaleFont } from "@/constants/ScaleFont";
 import { COLORS } from "@/pages/Home/style";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const TABS = [
   { key: "Home", icon: "home", route: "Home" },
@@ -16,17 +17,25 @@ export type TabKey = (typeof TABS)[number]["key"];
 
 export default function BottomTabBar({ active }: { active: TabKey }) {
   const navigation = useNavigation<any>();
+  const { token } = useAuth();
 
+  const onPress = (route: string) => {
+    if (token === null) {
+      navigation.navigate("Login", { route });
+    } else {
+      navigation.navigate(route);
+    }
+  };
   return (
     <View style={styles.tabBar}>
       {TABS.map((tab) => {
         const isActive = tab.key === active;
         return (
-          <TouchableOpacity
+          <Pressable
             key={tab.key}
             style={styles.tabItem}
             onPress={() => {
-              if (!isActive && tab.route) navigation.navigate(tab.route);
+              if (!isActive && tab.route) onPress(tab.route);
             }}
           >
             <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
@@ -39,7 +48,7 @@ export default function BottomTabBar({ active }: { active: TabKey }) {
             <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
               {tab.key}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>

@@ -10,7 +10,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useMemo, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import Animated, {
   FadeInLeft,
   FadeInRight,
@@ -105,13 +105,13 @@ export default function ProfilePage() {
                   returnKeyType="search"
                 />
                 {query ? (
-                  <TouchableOpacity onPress={() => onSearch("")} hitSlop={8}>
+                  <Pressable onPress={() => onSearch("")} hitSlop={8}>
                     <Ionicons
                       name="close-circle"
                       size={16}
                       color={COLORS.muted}
                     />
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : null}
               </Animated.View>
             ) : (
@@ -140,26 +140,26 @@ export default function ProfilePage() {
           </View>
 
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconBtn} onPress={toggleSearch}>
+            <Pressable style={styles.iconBtn} onPress={toggleSearch}>
               <Ionicons
                 name={searchOpen ? "close" : "search"}
                 size={18}
                 color={COLORS.red}
               />
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={styles.iconBtn}
               onPress={() => navigation.navigate("Filter")}
             >
               <Ionicons name="filter" size={18} color={COLORS.red} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconBtn}>
+            </Pressable>
+            <Pressable style={styles.iconBtn}>
               <Ionicons
                 name="notifications-outline"
                 size={18}
                 color={COLORS.red}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 

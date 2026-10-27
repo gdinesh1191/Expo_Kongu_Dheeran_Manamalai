@@ -1,6 +1,7 @@
+import { useAuth } from "@/app/AuthContext";
 import KeyboardAwareScrollView from "@/components/KeyboardAwareScrollView";
 import { checkCredentials, LoginRole } from "@/constants/DummyAuth";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
 import {
   Image,
@@ -11,7 +12,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import RemixIcon from "react-native-remix-icon";
@@ -40,6 +40,7 @@ const COLORS = {
 
 export default function LoginPage() {
   const navigation = useNavigation<any>();
+  const { login } = useAuth();
   const [role, setRole] = useState<LoginRole>("user");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +48,8 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
+  const route = useRoute<any>();
+  const routeParams = route.params ?? {};
   const onChangeRole = (next: LoginRole) => {
     setRole(next);
     setUsernameError("");
@@ -77,12 +79,13 @@ export default function LoginPage() {
     }
 
     if (role === "staff") {
+      login("staff");
       navigation.reset({
         index: 0,
         routes: [{ name: "Attendance", params: { role } }],
       });
     } else {
-      navigation.navigate("SendOtp", { role });
+      navigation.navigate("SendOtp", { role, route: routeParams.route });
     }
   };
 
@@ -182,16 +185,22 @@ export default function LoginPage() {
             <Text style={styles.rememberText}>Remember me</Text>
           </Pressable>
 
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={onLogin}
-            style={styles.button}
-          >
+          <Pressable onPress={onLogin} style={styles.button}>
             <Text style={styles.buttonText} numberOfLines={1}>
               Log In
             </Text>
             <RemixIcon name="arrow-right-line" size={16} color={COLORS.white} />
-          </TouchableOpacity>
+          </Pressable>
+
+          {/* Secure note */}
+          <View style={styles.secureRow}>
+            <RemixIcon
+              name="shield-check-line"
+              size={20}
+              color={COLORS.secure}
+            />
+            <Text style={styles.secureText}>Secure sign in</Text>
+          </View>
 
           <View style={styles.switchRow}>
             <Text style={styles.switchHint}>
@@ -205,16 +214,6 @@ export default function LoginPage() {
                 {role === "user" ? "Staff login" : "User login"}
               </Text>
             </Pressable>
-          </View>
-
-          {/* Secure note */}
-          <View style={styles.secureRow}>
-            <RemixIcon
-              name="shield-check-line"
-              size={20}
-              color={COLORS.secure}
-            />
-            <Text style={styles.secureText}>Secure sign in</Text>
           </View>
         </KeyboardAwareScrollView>
       </ImageBackground>

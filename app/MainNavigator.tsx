@@ -16,13 +16,24 @@ import VerificationScreen from "@/pages/VerificationScreen";
 import VerifyOtpPage from "@/pages/verifyOtp";
 import Webview from "@/pages/Webview";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { ActivityIndicator, View } from "react-native";
+import { useAuth } from "./AuthContext";
 
 const MainStack = createNativeStackNavigator();
 export default function MainNavigator() {
+  const { token, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={"#0B9A0B"} />
+      </View>
+    );
+  }
   return (
     <MainStack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName={"Login"}
+      initialRouteName={token === "staff" ? "Attendance" : "Home"}
     >
       <MainStack.Screen
         name="VerificationScreen"

@@ -2,7 +2,7 @@ import { FEED_ADMIN, FeedPost } from "@/constants/FeedPosts";
 import { Ionicons } from "@expo/vector-icons";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React, { useEffect, useState } from "react";
-import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { COLORS, styles } from "./style";
 
 type Props = {
@@ -33,7 +33,7 @@ function ActiveVideo({ uri, onToggle }: { uri: string; onToggle: () => void }) {
         pointerEvents="none"
       />
       <Pressable style={styles.mediaFill} onPress={onToggle} />
-      <TouchableOpacity
+      <Pressable
         style={styles.muteBtn}
         onPress={() => setMuted((value) => !value)}
       >
@@ -42,7 +42,7 @@ function ActiveVideo({ uri, onToggle }: { uri: string; onToggle: () => void }) {
           size={16}
           color={COLORS.white}
         />
-      </TouchableOpacity>
+      </Pressable>
     </>
   );
 }
