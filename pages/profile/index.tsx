@@ -72,7 +72,10 @@ export default function ProfilePage() {
             </View>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconBtn}>
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => navigation.navigate("Filter")}
+            >
               <Ionicons name="filter" size={20} color={COLORS.red} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconBtn}>

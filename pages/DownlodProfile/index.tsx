@@ -13,7 +13,6 @@ import {
     details,
     educationText,
     imageSource,
-    nameWithAge,
     profilePhotos,
 } from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
@@ -113,7 +112,7 @@ export default function DownlodProfile() {
 
   function buildBiodataText() {
     const lines = [
-      nameWithAge(profile),
+      profile.name,
       [clean(profile.location)].filter(Boolean).join(" · "),
       "",
       "BASIC DETAILS",
@@ -245,7 +244,7 @@ export default function DownlodProfile() {
 
         {/* Details sheet */}
         <View style={styles.sheet}>
-          <Text style={styles.name}>{nameWithAge(profile)}</Text>
+          <Text style={styles.name}>{profile.name}</Text>
           <Text style={styles.meta}>
             {[clean(profile.location)].filter(Boolean).join(" · ")}
           </Text>

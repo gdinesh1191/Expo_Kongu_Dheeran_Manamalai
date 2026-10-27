@@ -53,11 +53,18 @@ export default function SendOtpPage() {
         onPress={() => setChannel("phone")}
       />
 
-      <TouchableOpacity activeOpacity={0.85} onPress={onSend} style={styles.button}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={onSend}
+        style={styles.button}
+      >
         <Text style={styles.buttonText}>Send OTP</Text>
       </TouchableOpacity>
 
-      <Pressable onPress={() => navigation.navigate("Login")} hitSlop={8}>
+      <Pressable
+        onPress={() => navigation.navigate("Login")}
+        style={styles.backButton}
+      >
         <Text style={styles.back}>Back to Login</Text>
       </Pressable>
     </OtpScreenShell>
@@ -176,10 +183,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  backButton: {
+    alignSelf: "center",
+    marginTop: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
   back: {
     color: "rgba(255,255,255,0.8)",
     fontSize: 14,
     textAlign: "center",
-    marginTop: 16,
   },
 });

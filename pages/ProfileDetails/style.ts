@@ -7,10 +7,19 @@ export { COLORS };
 const HERO_HEIGHT = Dimensions.get("window").height * 0.42;
 export const SHEET_OVERLAP = scaleFont(26);
 
+const CANVAS = "#F4F6F4";
+const CARD_SHADOW = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.04,
+  shadowRadius: 6,
+  elevation: 1,
+};
+
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: CANVAS,
   },
 
   // Hero
@@ -18,7 +27,7 @@ export const styles = StyleSheet.create({
     height: HERO_HEIGHT,
     backgroundColor: COLORS.primary,
   },
- 
+
   avatarWrap: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
@@ -53,27 +62,43 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  heroPhotoArea: {
+    ...StyleSheet.absoluteFillObject,
+  },
   thumbs: {
     position: "absolute",
-    left: 0,
-    right: 0,
+    left: scaleFont(12),
+    right: scaleFont(12),
     bottom: SHEET_OVERLAP + scaleFont(12),
   },
   thumbsContent: {
-    paddingHorizontal: scaleFont(16),
+    alignItems: "center",
     gap: scaleFont(8),
+    padding: scaleFont(6),
+    borderRadius: scaleFont(14),
+    backgroundColor: "rgba(0,0,0,0.38)",
   },
   thumb: {
-    width: scaleFont(52),
-    height: scaleFont(64),
+    width: scaleFont(50),
+    height: scaleFont(62),
     borderRadius: scaleFont(10),
     overflow: "hidden",
-    borderWidth: 2,
-    borderColor: "transparent",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.6)",
     backgroundColor: "rgba(255,255,255,0.35)",
+    opacity: 0.6,
   },
   thumbActive: {
+    width: scaleFont(56),
+    height: scaleFont(70),
+    borderWidth: 3,
     borderColor: COLORS.white,
+    opacity: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 6,
   },
   thumbImage: {
     width: "100%",
@@ -84,42 +109,142 @@ export const styles = StyleSheet.create({
   sheet: {
     marginTop: -SHEET_OVERLAP,
     zIndex: 2,
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: scaleFont(28),
-    borderTopRightRadius: scaleFont(28),
+    backgroundColor: CANVAS,
+    borderTopLeftRadius: scaleFont(24),
+    borderTopRightRadius: scaleFont(24),
     overflow: "hidden",
-    paddingHorizontal: scaleFont(20),
-    paddingTop: scaleFont(24),
-    paddingBottom: scaleFont(24),
+    paddingHorizontal: scaleFont(16),
+    paddingBottom: scaleFont(28),
+  },
+
+  nameBlock: {
+    paddingTop: scaleFont(18),
+    paddingHorizontal: scaleFont(2),
   },
   name: {
-    fontSize: scaleFont(24),
+    fontSize: scaleFont(20),
     fontWeight: "800",
     color: COLORS.text,
+    letterSpacing: 0.2,
   },
-  meta: {
+  registerNo: {
     fontSize: scaleFont(13),
-    color: COLORS.muted,
+    color: COLORS.text,
     marginTop: scaleFont(4),
   },
-  tagsRow: {
+  registerNoValue: {
+    fontWeight: "400",
+    color: COLORS.text,
+  },
+
+  // Sections
+  section: {
+    marginTop: scaleFont(20),
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(8),
+    marginBottom: scaleFont(10),
+    paddingHorizontal: scaleFont(2),
+  },
+  sectionIcon: {
+    width: scaleFont(26),
+    height: scaleFont(26),
+    borderRadius: scaleFont(7),
+    backgroundColor: COLORS.primaryLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionTitle: {
+    fontSize: scaleFont(13),
+    fontWeight: "800",
+    color: COLORS.text,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  card: {
+    backgroundColor: COLORS.white,
+    borderRadius: scaleFont(14),
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...CARD_SHADOW,
+  },
+  assetsText: {
+    fontSize: scaleFont(13),
+    color: COLORS.text,
+    lineHeight: scaleFont(20),
+    paddingHorizontal: scaleFont(14),
+    paddingVertical: scaleFont(12),
+  },
+  cardSubHeader: {
+    paddingHorizontal: scaleFont(14),
+    paddingTop: scaleFont(12),
+    paddingBottom: scaleFont(10),
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    backgroundColor: CANVAS,
+  },
+  cardSubTitle: {
+    fontSize: scaleFont(11),
+    fontWeight: "800",
+    color: COLORS.primaryDark,
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  rows: {
+    paddingHorizontal: scaleFont(14),
+    paddingVertical: scaleFont(6),
+  },
+  rowsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: scaleFont(8),
-    marginTop: scaleFont(12),
   },
-  tag: {
-    paddingHorizontal: scaleFont(12),
-    paddingVertical: scaleFont(6),
-    borderRadius: scaleFont(16),
-    backgroundColor: "#FDE7E7",
+  row: {
+    paddingVertical: scaleFont(8),
+    gap: scaleFont(2),
   },
-  tagText: {
-    fontSize: scaleFont(12),
-    color: COLORS.red,
+  rowHalf: {
+    width: "50%",
+    paddingRight: scaleFont(10),
   },
-  tagValue: {
+  rowFull: {
+    width: "100%",
+  },
+  rowLabel: {
+    fontSize: scaleFont(13),
     fontWeight: "700",
+    color: COLORS.text,
+    lineHeight: scaleFont(19),
+  },
+  rowValue: {
+    fontSize: scaleFont(13),
+    fontWeight: "400",
+    color: COLORS.muted,
+    lineHeight: scaleFont(19),
+  },
+
+  horoscopeBtn: {
+    height: scaleFont(50),
+    marginTop: scaleFont(20),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scaleFont(8),
+    paddingHorizontal: scaleFont(16),
+  },
+  horoscopeBtnText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+  horoscopeBtnChevron: {
+    position: "absolute",
+    right: scaleFont(16),
   },
 
   // Footer
@@ -127,28 +252,53 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: scaleFont(12),
-    paddingHorizontal: scaleFont(18),
-    paddingVertical: scaleFont(14),
+    paddingHorizontal: scaleFont(16),
+    paddingTop: scaleFont(12),
+    paddingBottom: scaleFont(16),
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
     backgroundColor: COLORS.white,
   },
-  interestBtn: {
+  wishlistBtn: {
     flex: 1,
-    height: scaleFont(54),
-    borderRadius: scaleFont(16),
-    backgroundColor: COLORS.red,
+    height: scaleFont(50),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: COLORS.red,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    gap: scaleFont(6),
+    paddingHorizontal: scaleFont(8),
+  },
+  wishlistBtnActive: {
+    backgroundColor: COLORS.primary,
+  },
+  wishlistText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+  wishlistTextActive: {
+    color: COLORS.white,
+  },
+  interestBtn: {
+    flex: 1,
+    height: scaleFont(50),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    borderColor: COLORS.red,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scaleFont(6),
+    paddingHorizontal: scaleFont(8),
   },
   interestText: {
-    fontSize: scaleFont(16),
+    fontSize: scaleFont(14),
     fontWeight: "700",
-    color: COLORS.white,
+    color: COLORS.red,
   },
 });

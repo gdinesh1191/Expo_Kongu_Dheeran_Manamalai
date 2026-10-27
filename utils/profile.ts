@@ -14,6 +14,26 @@ export const ALL_PORUTHAMS = [
   "Vethai",
 ] as const;
 
+export type PoruthamKey = (typeof ALL_PORUTHAMS)[number];
+
+/** Left column, then right column, in the traditional 10-porutham order. */
+export const PORUTHAM_COLUMNS: { key: PoruthamKey; label: string }[][] = [
+  [
+    { key: "Thinam", label: "Thinam" },
+    { key: "Kanam", label: "Kanam" },
+    { key: "Mahendiram", label: "Mahendiram" },
+    { key: "Sthritheerkam", label: "Sthritheerkam" },
+    { key: "Yoni", label: "Yoni" },
+  ],
+  [
+    { key: "Rasi", label: "Rasi" },
+    { key: "Rasi Athipathi", label: "Rasi Athipathi" },
+    { key: "Vasiyam", label: "Vasiyam" },
+    { key: "Rajju", label: "Rajju" },
+    { key: "Vethai", label: "Vethai" },
+  ],
+];
+
 export type Detail = { label: string; value: string };
 
 /** Trimmed value, or undefined when empty. */
@@ -30,28 +50,6 @@ export function details(
     const v = clean(value);
     return v ? [{ label, value: v }] : [];
   });
-}
-
-/** Age in years from a "DD-MM-YYYY" date of birth. */
-export function getAge(dob?: string) {
-  const parts = clean(dob)?.split(/[-/.]/).map(Number);
-  if (!parts || parts.length !== 3 || parts.some(Number.isNaN))
-    return undefined;
-  const [day, month, year] = parts;
-  const today = new Date();
-  let age = today.getFullYear() - year;
-  if (
-    today.getMonth() + 1 < month ||
-    (today.getMonth() + 1 === month && today.getDate() < day)
-  ) {
-    age -= 1;
-  }
-  return age;
-}
-
-export function nameWithAge(profile: Profile) {
-  const age = getAge(profile.dob);
-  return age ? `${profile.name}, ${age}` : profile.name;
 }
 
 /** Accepts a bundled image (require) or a remote URL. */

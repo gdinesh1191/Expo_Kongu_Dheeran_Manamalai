@@ -1,6 +1,6 @@
 import FillImage from "@/components/FillImage";
 import { Profile } from "@/constants/SampleProfile";
-import { clean, details, getPoruthamMatch, nameWithAge, primaryPhoto } from "@/utils/profile";
+import { clean, details, getPoruthamMatch, primaryPhoto } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
@@ -63,7 +63,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
       </View>
 
       <View style={styles.cardInfo}>
-        <Text style={styles.profileName}>{nameWithAge(profile)}</Text>
+        <Text style={styles.profileName}>{profile.name}</Text>
 
         {infoLines.map((line) => (
           <View key={line.icon} style={styles.infoLine}>

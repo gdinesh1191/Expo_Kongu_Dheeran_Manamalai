@@ -1,7 +1,7 @@
 import BottomTabBar from "@/components/BottomTabBar";
 import FillImage from "@/components/FillImage";
 import { MY_PROFILE } from "@/constants/SampleProfile";
-import { clean, nameWithAge, primaryPhoto } from "@/utils/profile";
+import { clean, primaryPhoto } from "@/utils/profile";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -93,7 +93,7 @@ export default function MyProfile() {
         </View>
 
         <View style={styles.nameRow}>
-          <Text style={styles.name}>{nameWithAge(profile)}</Text>
+          <Text style={styles.name}>{profile.name}</Text>
         </View>
         <Text style={styles.meta}>
           {[clean(profile.WorkingCategory), clean(profile.location)]

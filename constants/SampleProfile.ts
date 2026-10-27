@@ -11,6 +11,10 @@ export type Profile = {
   WorkingCategory?: string;
   location: string;
   Designation: string;
+  CompanyName?: string;
+  MonthlyIncome?: string;
+  WorkingPlace?: string;
+  WorkingCountry?: string;
   photos?: (ImageSourcePropType | string)[];
   Height?: string;
   MaritalStatus?: string;

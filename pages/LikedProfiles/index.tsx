@@ -2,7 +2,7 @@ import BottomTabBar from "@/components/BottomTabBar";
 import FillImage from "@/components/FillImage";
 import { Profile } from "@/constants/SampleProfile";
 import { useLikedProfiles } from "@/context/LikedProfilesContext";
-import { nameWithAge, primaryPhoto } from "@/utils/profile";
+import { primaryPhoto } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -37,7 +37,7 @@ export default function LikedProfiles() {
         <View style={styles.cardInfo}>
           <View style={styles.nameRow}>
             <Text style={styles.name} numberOfLines={1}>
-              {nameWithAge(item)}
+              {item.name}
             </Text>
           </View>
           <Text style={styles.meta} numberOfLines={1}>

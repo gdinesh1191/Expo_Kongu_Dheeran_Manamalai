@@ -1,6 +1,7 @@
 import Attendance from "@/pages/attendance";
 import Chat from "@/pages/chat";
 import DownlodProfile from "@/pages/DownlodProfile";
+import FilterPage from "@/pages/filter";
 import Home from "@/pages/Home";
 import LikedProfiles from "@/pages/LikedProfiles";
 import LoginPage from "@/pages/login";
@@ -34,6 +35,11 @@ export default function MainNavigator() {
       <MainStack.Screen name="Profile" component={ProfilePage} />
       <MainStack.Screen name="ProfileDetails" component={ProfileDetails} />
       <MainStack.Screen name="DownlodProfile" component={DownlodProfile} />
+      <MainStack.Screen
+        name="Filter"
+        component={FilterPage}
+        options={{ animation: "slide_from_bottom" }}
+      />
       <MainStack.Screen name="MyProfile" component={MyProfile} />
       <MainStack.Screen name="LikedProfiles" component={LikedProfiles} />
       <MainStack.Screen name="Login" component={LoginPage} />

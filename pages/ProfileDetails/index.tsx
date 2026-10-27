@@ -1,21 +1,17 @@
 import HeroPhoto, { useHeroHeight } from "@/components/HeroPhoto";
 import {
-  ChipList,
-  DetailsGrid,
-  HoroscopeChart,
-  PoruthamMatch,
-  SectionTitle,
-  SubTitle,
+  HoroscopeViewer,
+  PoruthamBoard,
+  PoruthamPeople,
+  PoruthamResult,
 } from "@/components/ProfileSections";
 import { Profile, SAMPLE_PROFILES } from "@/constants/SampleProfile";
 import { useLikedProfiles } from "@/context/LikedProfilesContext";
 import {
+  Detail,
   clean,
-  dasaBalanceText,
   details,
-  educationText,
   imageSource,
-  nameWithAge,
   profilePhotos,
 } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -45,12 +41,83 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SWIPE_DOWN_DISTANCE = 80;
 const SWIPE_DOWN_VELOCITY = 900;
 const SPRING_BACK = { damping: 18, stiffness: 220 };
+const PHOTO_SWIPE_DISTANCE = 40;
+const PHOTO_SWIPE_VELOCITY = 500;
 
-function withOccupation(name?: string, occupation?: string) {
-  const n = clean(name);
-  const o = clean(occupation);
-  if (n && o) return `${n} (${o})`;
-  return n ?? o;
+type FeatherIcon = React.ComponentProps<typeof Feather>["name"];
+
+function Section({
+  title,
+  icon,
+  children,
+  plain,
+}: {
+  title: string;
+  icon: FeatherIcon;
+  children: React.ReactNode;
+  plain?: boolean;
+}) {
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <View style={styles.sectionIcon}>
+          <Feather name={icon} size={14} color={COLORS.primary} />
+        </View>
+        <Text style={styles.sectionTitle}>{title}</Text>
+      </View>
+      {plain ? children : <View style={styles.card}>{children}</View>}
+    </View>
+  );
+}
+
+/** Thisa Iruppu with its balance, e.g. "Jupiter 05 years, 04 months, 04 days". */
+function dasaText(profile: Profile) {
+  const balance = details([
+    ["years", profile.Year],
+    ["months", profile.Month],
+    ["days", profile.Day],
+  ])
+    .map((p) => `${p.value} ${p.label}`)
+    .join(", ");
+  return [clean(profile.ThisaIruppu), balance].filter(Boolean).join(" ");
+}
+
+/** Stacked label/value rows; `grid` lays them out two per line. */
+function InfoRows({
+  items,
+  grid,
+  fullWidth = [],
+}: {
+  items: Detail[];
+  grid?: boolean;
+  fullWidth?: string[];
+}) {
+  if (!items.length) return null;
+  return (
+    <View style={[styles.rows, grid && styles.rowsGrid]}>
+      {items.map((item) => (
+        <View
+          key={item.label}
+          style={[
+            styles.row,
+            grid && !fullWidth.includes(item.label) && styles.rowHalf,
+            grid && fullWidth.includes(item.label) && styles.rowFull,
+          ]}
+        >
+          <Text style={styles.rowLabel}>{item.label}</Text>
+          <Text style={styles.rowValue}>{item.value}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function CardSubTitle({ title }: { title: string }) {
+  return (
+    <View style={styles.cardSubHeader}>
+      <Text style={styles.cardSubTitle}>{title}</Text>
+    </View>
+  );
 }
 
 export default function ProfileDetails() {
@@ -63,6 +130,7 @@ export default function ProfileDetails() {
   const photos = profilePhotos(profile);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [horoscopeOpen, setHoroscopeOpen] = useState(false);
   const activePhoto = photos[activeIndex] ?? photos[0];
   const heroHeight = useHeroHeight(activePhoto, SHEET_OVERLAP);
   const scrollY = useSharedValue(0);
@@ -192,21 +260,66 @@ export default function ProfileDetails() {
     setPaused(true);
   }
 
+  const stepPhoto = useCallback(
+    (step: number) => {
+      if (photos.length < 2) return;
+      setActiveIndex((index) => (index + step + photos.length) % photos.length);
+      setPaused(true);
+    },
+    [photos.length],
+  );
+
+  const photoSwipe = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX([-15, 15])
+        .failOffsetY([-12, 12])
+        .onEnd((event) => {
+          if (
+            event.translationX < -PHOTO_SWIPE_DISTANCE ||
+            event.velocityX < -PHOTO_SWIPE_VELOCITY
+          ) {
+            runOnJS(stepPhoto)(1);
+          } else if (
+            event.translationX > PHOTO_SWIPE_DISTANCE ||
+            event.velocityX > PHOTO_SWIPE_VELOCITY
+          ) {
+            runOnJS(stepPhoto)(-1);
+          }
+        }),
+    [stepPhoto],
+  );
+
   const personal = details([
-    ["Date of birth", profile.dob],
-    ["Height", profile.Height],
-    ["Marital status", profile.MaritalStatus],
-    ["Complexion", profile.Complex],
-    ["Education", educationText(profile)],
-    ["Working category", profile.WorkingCategory],
-    ["Designation", profile.Designation],
-    ["Birth place", profile.BirthPlace],
+    ["Horoscope", profile.Horoscope],
+    ["Koottam", profile.Koottam],
     ["Kula Theivam", profile.KulaTheivam],
+    ["Height", profile.Height],
+    ["Complexion", profile.Complex],
+    ["D.O.B", profile.dob],
+    ["Birth place", profile.BirthPlace],
+    ["Marital status", profile.MaritalStatus],
+    ["Residential Area", profile.location],
   ]);
 
+  const education: Detail[] = (
+    [
+      ["Education Course", profile.EducationCourse],
+      ["Education Specification", profile.EducationSpecification],
+      ["Working Category", profile.WorkingCategory],
+      ["Designation", profile.Designation],
+      ["Company Name", profile.CompanyName],
+      ["Monthly Salary/Income", profile.MonthlyIncome],
+      ["Working Place", profile.WorkingPlace],
+      ["Working Country", profile.WorkingCountry],
+    ] as const
+  ).map(([label, value]) => ({ label, value: clean(value) ?? "-" }));
+
   const family = details([
-    ["Father", withOccupation(profile.FatherName, profile.FatherOccupation)],
-    ["Mother", withOccupation(profile.MotherName, profile.MotherOccupation)],
+    ["Father", profile.FatherName],
+    ["Father's occupation", profile.FatherOccupation],
+    ["Mother", profile.MotherName],
+    ["Mother's occupation", profile.MotherOccupation],
     ["Siblings", profile.SiblingsCount],
   ]);
   const assets = (profile.Property ?? []).map((p) => p.trim()).filter(Boolean);
@@ -217,22 +330,16 @@ export default function ProfileDetails() {
   ]);
 
   const horoscope = details([
-    ["Rasi", profile.Rashi],
+    ["Type of horoscope", profile.Horoscope],
     ["Star", profile.Star],
+    ["Rasi", profile.Rashi],
     ["Laknam", profile.Laknam],
-    ["Horoscope", profile.Horoscope],
-    ["Thisa Iruppu", profile.ThisaIruppu],
-    ["Dasa balance", dasaBalanceText(profile)],
-  ]);
-
-  const tags = details([
-    ["Koottam", profile.Koottam],
-    ["Porutham", profile.Porutham],
+    ["Thisa Iruppu", dasaText(profile)],
   ]);
 
   const hasFamilySection =
     family.length > 0 || assets.length > 0 || expectations.length > 0;
-  const hasHoroscopeSection = horoscope.length > 0 || !!profile.horoscopeImage;
+  const hasHoroscopeSection = horoscope.length > 0;
 
   return (
     <GestureDetector gesture={swipeDown}>
@@ -248,14 +355,21 @@ export default function ProfileDetails() {
           >
             {/* Photo / hero */}
             <View style={[styles.hero, { height: heroHeight }]}>
-              {activePhoto ? (
-                <HeroPhoto source={activePhoto} bottomInset={SHEET_OVERLAP} />
-              ) : (
-                <View style={styles.avatarWrap}>
-                  <View style={styles.avatarHead} />
-                  <View style={styles.avatarBody} />
+              <GestureDetector gesture={photoSwipe}>
+                <View style={styles.heroPhotoArea}>
+                  {activePhoto ? (
+                    <HeroPhoto
+                      source={activePhoto}
+                      bottomInset={SHEET_OVERLAP}
+                    />
+                  ) : (
+                    <View style={styles.avatarWrap}>
+                      <View style={styles.avatarHead} />
+                      <View style={styles.avatarBody} />
+                    </View>
+                  )}
                 </View>
-              )}
+              </GestureDetector>
 
               {photos.length > 1 && (
                 <ScrollView
@@ -303,55 +417,79 @@ export default function ProfileDetails() {
 
             {/* Details sheet */}
             <View style={styles.sheet}>
-              <Text style={styles.name}>{nameWithAge(profile)}</Text>
-              <Text style={styles.meta}>
-                {[clean(profile.location)].filter(Boolean).join(" · ")}
-              </Text>
-              {tags.length > 0 && (
-                <View style={styles.tagsRow}>
-                  {tags.map((t) => (
-                    <View key={t.label} style={styles.tag}>
-                      <Text style={styles.tagText}>
-                        {t.label}:{" "}
-                        <Text style={styles.tagValue}>{t.value}</Text>
-                      </Text>
-                    </View>
-                  ))}
-                </View>
+              <View style={styles.nameBlock}>
+                <Text style={styles.name}>{profile.name}</Text>
+                <Text style={styles.registerNo}>
+                  Register No:{" "}
+                  <Text style={styles.registerNoValue}>{profile.id}</Text>
+                </Text>
+              </View>
+
+              {personal.length > 0 && (
+                <Section title="Basic details" icon="user">
+                  <InfoRows
+                    items={personal}
+                    grid
+                    fullWidth={["Kula Theivam"]}
+                  />
+                </Section>
               )}
 
-              <SectionTitle title="Basic details" icon="user" />
-              <DetailsGrid items={personal} />
+              <Section title="Education and occupation" icon="briefcase">
+                <InfoRows items={education} />
+              </Section>
 
               {hasFamilySection && (
-                <>
-                  <SectionTitle title="Family and assets" icon="home" />
-                  <DetailsGrid items={family} />
+                <Section title="Family and assets" icon="home">
+                  <InfoRows items={family} />
                   {assets.length > 0 && (
                     <>
-                      <SubTitle title="Assets" />
-                      <ChipList items={assets} />
+                      <CardSubTitle title="Assets" />
+                      <Text style={styles.assetsText}>{assets.join(", ")}</Text>
                     </>
                   )}
                   {expectations.length > 0 && (
                     <>
-                      <SubTitle title="Expectations" />
-                      <DetailsGrid items={expectations} />
+                      <CardSubTitle title="Expectations" />
+                      <InfoRows items={expectations} />
                     </>
                   )}
-                </>
+                </Section>
               )}
 
               {hasHoroscopeSection && (
-                <>
-                  <SectionTitle title="Horoscope" icon="sun" />
-                  <DetailsGrid items={horoscope} />
-                  <HoroscopeChart source={profile.horoscopeImage} />
-                </>
+                <Section title="Horoscope" icon="sun">
+                  <InfoRows items={horoscope} />
+                </Section>
               )}
 
-              <SectionTitle title="Porutham match" icon="heart" />
-              <PoruthamMatch profile={profile} />
+              <Section title="Porutham" icon="heart" plain>
+                <PoruthamPeople profile={profile} />
+              </Section>
+
+              <Section title="Porutham Details" icon="check-square" plain>
+                <PoruthamBoard profile={profile} />
+                <PoruthamResult profile={profile} />
+              </Section>
+
+              {!!profile.horoscopeImage && (
+                <TouchableOpacity
+                  style={styles.horoscopeBtn}
+                  onPress={() => setHoroscopeOpen(true)}
+                  activeOpacity={0.85}
+                >
+                  <Feather name="book-open" size={18} color={COLORS.primary} />
+                  <Text style={styles.horoscopeBtnText}>
+                    View Full Horoscope
+                  </Text>
+                  <Feather
+                    name="chevron-right"
+                    size={18}
+                    color={COLORS.primary}
+                    style={styles.horoscopeBtnChevron}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
           </Animated.ScrollView>
         </GestureDetector>
@@ -359,12 +497,36 @@ export default function ProfileDetails() {
         {/* Footer actions */}
         <View style={styles.footer}>
           <TouchableOpacity
+            style={[styles.wishlistBtn, liked && styles.wishlistBtnActive]}
+            onPress={() => toggleLike(profile)}
+            activeOpacity={0.85}
+          >
+            <Ionicons
+              name={liked ? "heart" : "heart-outline"}
+              size={18}
+              color={liked ? COLORS.white : COLORS.primary}
+            />
+            <Text
+              style={[styles.wishlistText, liked && styles.wishlistTextActive]}
+            >
+              {liked ? "Wishlisted" : "Wishlist"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={styles.interestBtn}
             onPress={() => navigation.navigate("DownlodProfile", { profile })}
+            activeOpacity={0.85}
           >
-            <Text style={styles.interestText}>Click to Download Profile</Text>
+            <Feather name="download" size={18} color={COLORS.red} />
+            <Text style={styles.interestText}>Download Profile</Text>
           </TouchableOpacity>
         </View>
+
+        <HoroscopeViewer
+          source={profile.horoscopeImage}
+          visible={horoscopeOpen}
+          onClose={() => setHoroscopeOpen(false)}
+        />
       </Animated.View>
     </GestureDetector>
   );

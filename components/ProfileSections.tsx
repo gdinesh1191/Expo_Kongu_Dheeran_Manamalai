@@ -2,24 +2,26 @@ import { MY_PROFILE, Profile } from "@/constants/SampleProfile";
 import { scaleFont } from "@/constants/ScaleFont";
 import { COLORS } from "@/pages/Home/style";
 import {
-    Detail,
-    clean,
-    getPoruthamMatch,
-    imageSource,
-    nameWithAge,
-    primaryPhoto,
+  Detail,
+  PORUTHAM_COLUMNS,
+  clean,
+  getPoruthamMatch,
+  imageSource,
+  primaryPhoto,
 } from "@/utils/profile";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-    ImageSourcePropType,
-    Modal,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  ImageSourcePropType,
+  Modal,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  ViewStyle,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 import FillImage, { useImageRatio } from "./FillImage";
 
@@ -102,11 +104,7 @@ export function HoroscopeChart({
 }) {
   const [open, setOpen] = useState(false);
   const ratio = useImageRatio(source) ?? DEFAULT_CHART_RATIO;
-  const window = useWindowDimensions();
   if (!imageSource(source)) return null;
-
-  const viewerW = Math.min(window.width * 0.96, window.height * 0.85 * ratio);
-  const viewerH = viewerW / ratio;
 
   return (
     <>
@@ -122,48 +120,127 @@ export function HoroscopeChart({
         </View>
       </TouchableOpacity>
 
-      <Modal
+      <HoroscopeViewer
+        source={source}
         visible={open}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setOpen(false)}
-      >
-        <Pressable style={styles.viewerBackdrop} onPress={() => setOpen(false)}>
-          <View
-            style={[styles.viewerChart, { width: viewerW, height: viewerH }]}
-          >
-            <FillImage source={source} mode="contain" align="center" />
-          </View>
-          <View style={styles.viewerClose}>
-            <Feather name="x" size={22} color={COLORS.white} />
-          </View>
-        </Pressable>
-      </Modal>
+        onClose={() => setOpen(false)}
+      />
     </>
   );
 }
 
-function PersonColumn({ profile, label }: { profile: Profile; label: string }) {
-  const astro = [
-    ["Rasi", clean(profile.Rashi)],
-    ["Star", clean(profile.Star)],
-  ].filter((r): r is [string, string] => !!r[1]);
+/** Full-screen horoscope chart; tapping anywhere closes it. */
+export function HoroscopeViewer({
+  source,
+  visible,
+  onClose,
+}: {
+  source?: ImageSourcePropType | string;
+  visible: boolean;
+  onClose: () => void;
+}) {
+  const ratio = useImageRatio(source) ?? DEFAULT_CHART_RATIO;
+  const window = useWindowDimensions();
+  if (!imageSource(source)) return null;
+
+  const viewerW = Math.min(window.width * 0.96, window.height * 0.85 * ratio);
+  const viewerH = viewerW / ratio;
 
   return (
-    <View style={styles.person}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.viewerBackdrop} onPress={onClose}>
+        <View style={[styles.viewerChart, { width: viewerW, height: viewerH }]}>
+          <FillImage source={source} mode="contain" align="center" />
+        </View>
+        <View style={styles.viewerClose}>
+          <Feather name="x" size={22} color={COLORS.white} />
+        </View>
+      </Pressable>
+    </Modal>
+  );
+}
+
+const GRADE_COLORS: Record<string, string> = {
+  mathimam: "#F2C200",
+  uthamam: COLORS.primary,
+  athamam: COLORS.red,
+};
+
+const STAR_COLOR = "#E5A800";
+
+function PersonCard({ profile }: { profile: Profile }) {
+  const astro = [
+    { label: "Star", value: clean(profile.Star), icon: "star" as const },
+    { label: "Rasi", value: clean(profile.Rashi), icon: "moon" as const },
+  ].filter((r) => !!r.value);
+
+  return (
+    <View style={styles.personCard}>
       <View style={styles.personPhoto}>
-        <Feather name="user" size={28} color="rgba(255,255,255,0.8)" />
+        <Feather name="user" size={32} color="rgba(255,255,255,0.8)" />
         <FillImage source={primaryPhoto(profile)} />
       </View>
-      <Text style={styles.personLabel}>{label}</Text>
-      <Text style={styles.personName} numberOfLines={2}>
-        {nameWithAge(profile)}
+      <Text style={styles.personName} numberOfLines={1}>
+        {profile.name}
       </Text>
-      {astro.map(([k, v]) => (
-        <Text key={k} style={styles.personAstro} numberOfLines={1}>
-          {k}: <Text style={styles.personAstroValue}>{v}</Text>
-        </Text>
+      {astro.map((row) => (
+        <View key={row.label} style={styles.personAstroRow}>
+          <Ionicons
+            name={row.icon}
+            size={12}
+            color={row.icon === "star" ? STAR_COLOR : COLORS.primary}
+          />
+          <Text style={styles.personAstro} numberOfLines={1}>
+            {row.label} :{" "}
+            <Text style={styles.personAstroValue}>{row.value}</Text>
+          </Text>
+        </View>
       ))}
+    </View>
+  );
+}
+
+/** The logged-in user and the profile, side by side. */
+export function PoruthamPeople({
+  profile,
+  me = MY_PROFILE,
+}: {
+  profile: Profile;
+  me?: Profile;
+}) {
+  return (
+    <View style={styles.matchPeople}>
+      <PersonCard profile={me} />
+      <PersonCard profile={profile} />
+    </View>
+  );
+}
+
+/** Matched count out of 10 with the profile's porutham grade. */
+export function PoruthamResult({ profile }: { profile: Profile }) {
+  const { matched, total } = getPoruthamMatch(profile);
+  const grade = clean(profile.Porutham);
+  const gradeColor = GRADE_COLORS[grade?.toLowerCase() ?? ""] ?? COLORS.red;
+  const valueStyle = [styles.resultValue, { color: gradeColor }];
+
+  return (
+    <View style={styles.resultCard}>
+      <Text style={styles.resultLabel}>
+        Porutham :{" "}
+        <Text style={valueStyle}>
+          {matched.length}/{total}
+        </Text>
+      </Text>
+      {grade && (
+        <Text style={styles.resultLabel}>
+          Result : <Text style={valueStyle}>{grade}</Text>
+        </Text>
+      )}
     </View>
   );
 }
@@ -176,50 +253,66 @@ export function PoruthamMatch({
   profile: Profile;
   me?: Profile;
 }) {
-  const { matched, unmatched, total } = getPoruthamMatch(profile);
-  const grade = clean(profile.Porutham);
-
   return (
     <View>
-      <View style={styles.matchCard}>
-        <PersonColumn profile={me} label="You" />
-        <View style={styles.matchCenter}>
-          <View style={styles.scoreCircle}>
-            <Text style={styles.scoreValue}>{matched.length}</Text>
-            <Text style={styles.scoreTotal}>of {total}</Text>
-          </View>
-          <Text style={styles.scoreLabel}>Poruthams</Text>
-          {grade && (
-            <View style={styles.gradeBadge}>
-              <Text style={styles.gradeText}>{grade}</Text>
-            </View>
-          )}
+      <PoruthamPeople profile={profile} me={me} />
+      <PoruthamBoard profile={profile} style={styles.boardGap} />
+      <PoruthamResult profile={profile} />
+    </View>
+  );
+}
+
+/** Tick or cross for each of the 10 poruthams. */
+export function PoruthamBoard({
+  profile,
+  style,
+}: {
+  profile: Profile;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const { matched } = getPoruthamMatch(profile);
+  const matchedSet = new Set(matched.map((p) => p.toLowerCase()));
+
+  return (
+    <View style={[styles.poruthamBoard, style]}>
+      {PORUTHAM_COLUMNS.map((column) => (
+        <View key={column[0].key} style={styles.poruthamColumn}>
+          {column.map((item) => {
+            const ok = matchedSet.has(item.key.toLowerCase());
+            return (
+              <View
+                key={item.key}
+                style={[
+                  styles.poruthamItem,
+                  ok ? styles.poruthamItemOk : styles.poruthamItemNo,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.poruthamIcon,
+                    { backgroundColor: ok ? COLORS.primary : COLORS.red },
+                  ]}
+                >
+                  <Feather
+                    name={ok ? "check" : "x"}
+                    size={13}
+                    color={COLORS.white}
+                  />
+                </View>
+                <Text
+                  style={[
+                    styles.poruthamLabel,
+                    { color: ok ? COLORS.text : COLORS.red },
+                  ]}
+                  numberOfLines={2}
+                >
+                  {item.label}
+                </Text>
+              </View>
+            );
+          })}
         </View>
-        <PersonColumn profile={profile} label="Profile" />
-      </View>
-
-      <View style={styles.progressTrack}>
-        <View
-          style={[
-            styles.progressFill,
-            { width: `${(matched.length / total) * 100}%` },
-          ]}
-        />
-      </View>
-
-      <SubTitle title={`Matched (${matched.length})`} />
-      {matched.length ? (
-        <ChipList items={matched} variant="success" icon="check" />
-      ) : (
-        <Text style={styles.emptyText}>No poruthams matched.</Text>
-      )}
-
-      <SubTitle title={`Not matched (${unmatched.length})`} />
-      {unmatched.length ? (
-        <ChipList items={unmatched} variant="danger" icon="x" />
-      ) : (
-        <Text style={styles.emptyText}>All poruthams matched.</Text>
-      )}
+      ))}
     </View>
   );
 }
@@ -351,109 +444,124 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  matchCard: {
+  matchPeople: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    padding: scaleFont(14),
-    borderRadius: scaleFont(18),
+    alignItems: "stretch",
+    gap: scaleFont(12),
+  },
+  personCard: {
+    flex: 1,
+    padding: scaleFont(6),
+    paddingBottom: scaleFont(10),
+    borderRadius: scaleFont(16),
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.white,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  personPhoto: {
+    width: "100%",
+    aspectRatio: 1,
+    borderRadius: scaleFont(12),
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  personName: {
+    fontSize: scaleFont(15),
+    fontWeight: "800",
+    color: COLORS.text,
+    marginTop: scaleFont(8),
+    marginBottom: scaleFont(4),
+    paddingHorizontal: scaleFont(4),
+  },
+  personAstroRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(6),
+    marginTop: scaleFont(3),
+    paddingHorizontal: scaleFont(4),
+  },
+  personAstro: {
+    flex: 1,
+    fontSize: scaleFont(12),
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+  personAstroValue: {
+    fontWeight: "400",
+    color: COLORS.muted,
+  },
+  boardGap: {
+    marginTop: scaleFont(16),
+  },
+  resultCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: scaleFont(12),
+    marginTop: scaleFont(12),
+    paddingHorizontal: scaleFont(16),
+    paddingVertical: scaleFont(14),
+    borderRadius: scaleFont(16),
     borderWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.white,
   },
-  person: {
+  resultLabel: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+  resultValue: {
+    fontWeight: "400",
+  },
+  poruthamBoard: {
+    flexDirection: "row",
+    gap: scaleFont(10),
+    padding: scaleFont(10),
+    borderRadius: scaleFont(16),
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.white,
+  },
+  poruthamColumn: {
     flex: 1,
-    alignItems: "center",
+    gap: scaleFont(8),
   },
-  personPhoto: {
-    width: scaleFont(64),
-    height: scaleFont(64),
-    borderRadius: scaleFont(32),
-    borderWidth: 3,
-    borderColor: COLORS.primaryLight,
-    backgroundColor: COLORS.primary,
+  poruthamItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(8),
+    minHeight: scaleFont(44),
+    paddingHorizontal: scaleFont(8),
+    paddingVertical: scaleFont(6),
+    borderRadius: scaleFont(10),
+    borderWidth: 1,
+  },
+  poruthamItemOk: {
+    backgroundColor: "#F1F8F1",
+    borderColor: "#D6ECD6",
+  },
+  poruthamItemNo: {
+    backgroundColor: "#FDF0F0",
+    borderColor: "#F7D2D2",
+  },
+  poruthamIcon: {
+    width: scaleFont(22),
+    height: scaleFont(22),
+    borderRadius: scaleFont(11),
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
   },
-  personLabel: {
-    fontSize: scaleFont(10),
-    fontWeight: "700",
-    color: COLORS.muted,
-    textTransform: "uppercase",
-    marginTop: scaleFont(6),
-  },
-  personName: {
+  poruthamLabel: {
+    flex: 1,
     fontSize: scaleFont(13),
-    fontWeight: "700",
-    color: COLORS.text,
-    textAlign: "center",
-    marginTop: scaleFont(2),
-  },
-  personAstro: {
-    fontSize: scaleFont(11),
-    color: COLORS.muted,
-    marginTop: scaleFont(2),
-  },
-  personAstroValue: {
-    fontWeight: "700",
-    color: COLORS.text,
-  },
-  matchCenter: {
-    alignItems: "center",
-    paddingHorizontal: scaleFont(6),
-    paddingTop: scaleFont(4),
-  },
-  scoreCircle: {
-    width: scaleFont(62),
-    height: scaleFont(62),
-    borderRadius: scaleFont(31),
-    borderWidth: 4,
-    borderColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scoreValue: {
-    fontSize: scaleFont(20),
-    fontWeight: "800",
-    color: COLORS.primary,
-    lineHeight: scaleFont(22),
-  },
-  scoreTotal: {
-    fontSize: scaleFont(10),
-    color: COLORS.muted,
-  },
-  scoreLabel: {
-    fontSize: scaleFont(11),
-    fontWeight: "600",
-    color: COLORS.text,
-    marginTop: scaleFont(6),
-  },
-  gradeBadge: {
-    marginTop: scaleFont(6),
-    paddingHorizontal: scaleFont(10),
-    paddingVertical: scaleFont(3),
-    borderRadius: scaleFont(12),
-    backgroundColor: COLORS.red,
-  },
-  gradeText: {
-    fontSize: scaleFont(11),
-    fontWeight: "700",
-    color: COLORS.white,
-  },
-  progressTrack: {
-    height: scaleFont(8),
-    borderRadius: scaleFont(4),
-    backgroundColor: "#FDE7E7",
-    marginTop: scaleFont(14),
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: scaleFont(4),
-    backgroundColor: COLORS.primary,
-  },
-  emptyText: {
-    fontSize: scaleFont(12),
-    color: COLORS.muted,
+    fontWeight: "500",
   },
 });

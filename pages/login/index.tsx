@@ -26,9 +26,6 @@ const COLORS = {
   bg: "#0B3B1E",
   overlay: "rgba(5, 40, 18, 0.55)",
   gold: "#B79B5B",
-  tabGold: "#C9A24B",
-  tabText: "#0B2A14",
-  cream: "#F5F0E6",
   field: "#F6F2EA",
   fieldText: "#6B7280",
   icon: "#374151",
@@ -118,48 +115,9 @@ export default function LoginPage() {
             <View style={styles.line} />
           </View>
 
-          <Text style={styles.subtitle}>Sign in to continue</Text>
-
-          <View style={styles.roleRow}>
-            <Pressable
-              style={[
-                styles.roleOption,
-                role === "user" && styles.roleOptionOn,
-              ]}
-              onPress={() => onChangeRole("user")}
-            >
-              <RemixIcon
-                name="user-3-line"
-                size={18}
-                color={role === "user" ? COLORS.tabText : COLORS.cream}
-              />
-              <Text
-                style={[styles.roleText, role === "user" && styles.roleTextOn]}
-                numberOfLines={1}
-              >
-                User Login
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.roleOption,
-                role === "staff" && styles.roleOptionOn,
-              ]}
-              onPress={() => onChangeRole("staff")}
-            >
-              <RemixIcon
-                name="shield-user-line"
-                size={18}
-                color={role === "staff" ? COLORS.tabText : COLORS.cream}
-              />
-              <Text
-                style={[styles.roleText, role === "staff" && styles.roleTextOn]}
-                numberOfLines={1}
-              >
-                Staff Login
-              </Text>
-            </Pressable>
-          </View>
+          <Text style={styles.subtitle}>
+            {role === "staff" ? "Staff login" : "User login"}
+          </Text>
 
           {/* Username */}
           <View
@@ -234,6 +192,20 @@ export default function LoginPage() {
             </Text>
             <RemixIcon name="arrow-right-line" size={16} color={COLORS.white} />
           </TouchableOpacity>
+
+          <View style={styles.switchRow}>
+            <Text style={styles.switchHint}>
+              {role === "user" ? "Staff member? " : "Not staff? "}
+            </Text>
+            <Pressable
+              onPress={() => onChangeRole(role === "user" ? "staff" : "user")}
+              hitSlop={8}
+            >
+              <Text style={styles.switchLink}>
+                {role === "user" ? "Staff login" : "User login"}
+              </Text>
+            </Pressable>
+          </View>
 
           {/* Secure note */}
           <View style={styles.secureRow}>
@@ -317,37 +289,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  roleRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 20,
-  },
-  roleOption: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    height: 46,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.45)",
-    backgroundColor: "rgba(255,255,255,0.08)",
-    paddingHorizontal: 8,
-  },
-  roleOptionOn: {
-    backgroundColor: COLORS.tabGold,
-    borderColor: COLORS.tabGold,
-  },
-  roleText: {
-    color: COLORS.cream,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  roleTextOn: {
-    color: COLORS.tabText,
-  },
-
   field: {
     flexDirection: "row",
     alignItems: "center",
@@ -421,6 +362,19 @@ const styles = StyleSheet.create({
   },
   buttonPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
   buttonText: { color: COLORS.white, fontSize: 16, fontWeight: "700" },
+
+  switchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 18,
+  },
+  switchHint: { color: COLORS.soft, fontSize: 14 },
+  switchLink: {
+    color: COLORS.gold,
+    fontSize: 14,
+    fontWeight: "700",
+  },
 
   secureRow: {
     flexDirection: "row",
