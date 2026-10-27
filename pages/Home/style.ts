@@ -73,6 +73,34 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
 
+  // Header search
+  headerSlot: {
+    flex: 1,
+    height: scaleFont(42),
+    marginRight: scaleFont(10),
+    overflow: "hidden",
+  },
+  headerSlotFill: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  headerSearch: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(6),
+    marginVertical: scaleFont(4),
+    paddingHorizontal: scaleFont(10),
+    borderRadius: scaleFont(10),
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: "#F7F7F7",
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: scaleFont(13),
+    color: COLORS.text,
+    paddingVertical: 0,
+  },
+  flexShrink: { flexShrink: 1 },
   // Segmented toggle
   segment: {
     flexDirection: "row",
@@ -333,14 +361,9 @@ export const styles = StyleSheet.create({
     paddingBottom: scaleFont(4),
   },
   post: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: scaleFont(10),
-    marginHorizontal: scaleFont(14),
+    marginHorizontal: scaleFont(8),
     marginBottom: scaleFont(12),
-    paddingHorizontal: scaleFont(12),
-    paddingTop: scaleFont(12),
-    paddingBottom: scaleFont(12),
+    paddingVertical: scaleFont(12),
     borderRadius: scaleFont(18),
     backgroundColor: COLORS.white,
     shadowColor: "#1F2A1F",
@@ -349,11 +372,22 @@ export const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  postHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(10),
+    paddingHorizontal: scaleFont(12),
+  },
+  postHeaderText: {
+    flex: 1,
+  },
+  captionWrap: {
+    paddingHorizontal: scaleFont(12),
+  },
   postAvatar: {
     width: scaleFont(40),
     height: scaleFont(40),
     borderRadius: scaleFont(20),
-    backgroundColor: COLORS.primaryLight,
     overflow: "hidden",
   },
   tweetBody: {
@@ -376,7 +410,7 @@ export const styles = StyleSheet.create({
     color: COLORS.muted,
   },
   tweetText: {
-    marginTop: scaleFont(6),
+    marginTop: scaleFont(10),
     fontSize: scaleFont(15),
     lineHeight: scaleFont(21),
     color: COLORS.text,
@@ -384,14 +418,20 @@ export const styles = StyleSheet.create({
   tweetMedia: {
     marginTop: scaleFont(10),
     width: "100%",
-    aspectRatio: 16 / 9,
-    borderRadius: scaleFont(14),
+    aspectRatio: 4 / 5, // portrait like Instagram (was 16 / 9)
+    // borderRadius: scaleFont(14),
     backgroundColor: "#D6E4F5",
     overflow: "hidden",
+  },
+
+  moreText: {
+    fontWeight: "600",
+    color: COLORS.muted,
   },
   mediaFill: {
     ...StyleSheet.absoluteFillObject,
   },
+
   videoIdle: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",

@@ -13,7 +13,15 @@ import Animated, {
 } from "react-native-reanimated";
 import { COLORS } from "../Home/style";
 
-const STEPS = [
+export type SwipeGuideStep = {
+  key: string;
+  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  title: string;
+  text: string;
+  target: { x: number; y: number };
+};
+
+const PROFILE_STEPS: SwipeGuideStep[] = [
   {
     key: "left",
     icon: "gesture-swipe-left",
@@ -35,7 +43,7 @@ const STEPS = [
     text: "Open the full profile details",
     target: { x: 0, y: -70 },
   },
-] as const;
+];
 
 const STEP_DURATION = 2000;
 const MOVE_DELAY = 350;
@@ -44,9 +52,16 @@ const MOVE_DURATION = 700;
 type Props = {
   visible: boolean;
   onClose: () => void;
+  title?: string;
+  steps?: SwipeGuideStep[];
 };
 
-export default function SwipeGuideModal({ visible, onClose }: Props) {
+export default function SwipeGuideModal({
+  visible,
+  onClose,
+  title = "How to browse profiles",
+  steps = PROFILE_STEPS,
+}: Props) {
   const [step, setStep] = useState(0);
   const tx = useSharedValue(0);
   const ty = useSharedValue(0);
@@ -55,7 +70,7 @@ export default function SwipeGuideModal({ visible, onClose }: Props) {
   useEffect(() => {
     if (!visible) return;
 
-    const { target } = STEPS[step];
+    const { target } = steps[step];
     const easing = Easing.out(Easing.cubic);
     const reset = (to: number) => withTiming(to, { duration: 0 });
     tx.value = withSequence(
@@ -71,9 +86,9 @@ export default function SwipeGuideModal({ visible, onClose }: Props) {
       withDelay(MOVE_DELAY + MOVE_DURATION, withTiming(0, { duration: 300 })),
     );
 
-    const timer = setTimeout(() => setStep((s) => (s + 1) % STEPS.length), STEP_DURATION);
+    const timer = setTimeout(() => setStep((s) => (s + 1) % steps.length), STEP_DURATION);
     return () => clearTimeout(timer);
-  }, [step, visible, tx, ty, opacity]);
+  }, [step, visible, tx, ty, opacity, steps]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -89,13 +104,13 @@ export default function SwipeGuideModal({ visible, onClose }: Props) {
     transform: [{ translateX: tx.value }, { translateY: ty.value }],
   }));
 
-  const current = STEPS[step];
+  const current = steps[step];
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
-          <Text style={styles.title}>How to browse profiles</Text>
+          <Text style={styles.title}>{title}</Text>
 
           {/* Animated demo */}
           <View style={styles.demo}>
@@ -121,7 +136,7 @@ export default function SwipeGuideModal({ visible, onClose }: Props) {
           </View>
 
           <View style={styles.dots}>
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <TouchableOpacity key={s.key} onPress={() => setStep(i)} hitSlop={8}>
                 <View style={[styles.dot, i === step && styles.dotActive]} />
               </TouchableOpacity>

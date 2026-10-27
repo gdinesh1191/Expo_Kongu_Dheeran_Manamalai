@@ -41,7 +41,8 @@
           "mode": "production"
         }
       ],
-      "expo-maps"
+      "expo-maps",
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true,

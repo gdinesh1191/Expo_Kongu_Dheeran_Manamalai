@@ -1,4 +1,5 @@
 import FillImage from "@/components/FillImage";
+import { poruthamGradeColor } from "@/components/ProfileSections";
 import { Profile } from "@/constants/SampleProfile";
 import { clean, details, getPoruthamMatch, primaryPhoto } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -55,7 +56,12 @@ export function ProfileCard({ profile }: { profile: Profile }) {
 
       <View pointerEvents="none" style={styles.gradient} />
 
-      <View style={styles.poruthamBadge}>
+      <View
+        style={[
+          styles.poruthamBadge,
+          { backgroundColor: poruthamGradeColor(profile) },
+        ]}
+      >
         <Ionicons name="heart" size={14} color={COLORS.white} />
         <Text style={styles.poruthamBadgeText}>
           {porutham.matched.length}/{porutham.total}

@@ -17,10 +17,10 @@ import {
   Pressable,
   StyleProp,
   StyleSheet,
-  ViewStyle,
   Text,
   TouchableOpacity,
   View,
+  ViewStyle,
   useWindowDimensions,
 } from "react-native";
 import FillImage, { useImageRatio } from "./FillImage";
@@ -171,6 +171,12 @@ const GRADE_COLORS: Record<string, string> = {
   athamam: COLORS.red,
 };
 
+export function poruthamGradeColor(profile: Profile) {
+  return (
+    GRADE_COLORS[clean(profile.Porutham)?.toLowerCase() ?? ""] ?? COLORS.red
+  );
+}
+
 const STAR_COLOR = "#E5A800";
 
 function PersonCard({ profile }: { profile: Profile }) {
@@ -225,7 +231,7 @@ export function PoruthamPeople({
 export function PoruthamResult({ profile }: { profile: Profile }) {
   const { matched, total } = getPoruthamMatch(profile);
   const grade = clean(profile.Porutham);
-  const gradeColor = GRADE_COLORS[grade?.toLowerCase() ?? ""] ?? COLORS.red;
+  const gradeColor = poruthamGradeColor(profile);
   const valueStyle = [styles.resultValue, { color: gradeColor }];
 
   return (
@@ -519,7 +525,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   resultValue: {
-    fontWeight: "400",
+    fontWeight: "800",
   },
   poruthamBoard: {
     flexDirection: "row",

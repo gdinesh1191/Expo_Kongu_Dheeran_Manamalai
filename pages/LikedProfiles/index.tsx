@@ -71,7 +71,7 @@ export default function LikedProfiles() {
           </Text>
           <TouchableOpacity
             style={styles.discoverBtn}
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => navigation.navigate("Profile")}
           >
             <Text style={styles.discoverText}>Discover profiles</Text>
           </TouchableOpacity>

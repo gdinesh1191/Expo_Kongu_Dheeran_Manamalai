@@ -171,9 +171,9 @@ export const styles = StyleSheet.create({
     ...CARD_SHADOW,
   },
   assetsText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     color: COLORS.text,
-    lineHeight: scaleFont(20),
+    lineHeight: scaleFont(21),
     paddingHorizontal: scaleFont(14),
     paddingVertical: scaleFont(12),
   },
@@ -218,10 +218,10 @@ export const styles = StyleSheet.create({
     lineHeight: scaleFont(19),
   },
   rowValue: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     fontWeight: "400",
     color: COLORS.muted,
-    lineHeight: scaleFont(19),
+    lineHeight: scaleFont(20),
   },
 
   horoscopeBtn: {

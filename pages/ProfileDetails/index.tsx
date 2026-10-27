@@ -7,17 +7,13 @@ import {
 } from "@/components/ProfileSections";
 import { Profile, SAMPLE_PROFILES } from "@/constants/SampleProfile";
 import { useLikedProfiles } from "@/context/LikedProfilesContext";
-import {
-  Detail,
-  clean,
-  details,
-  imageSource,
-  profilePhotos,
-} from "@/utils/profile";
+import { imageSource, profilePhotos } from "@/utils/profile";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Dimensions,
   Image,
   ScrollView,
@@ -35,7 +31,34 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import SwipeGuideModal, { SwipeGuideStep } from "../profile/SwipeGuideModal";
+import ProfileInfo, { HoroscopeButton, Section } from "./ProfileInfo";
 import { COLORS, SHEET_OVERLAP, styles } from "./style";
+
+const DETAILS_GUIDE_SEEN_KEY = "profile_details_swipe_guide_seen";
+const PHOTO_GUIDE_STEPS: SwipeGuideStep[] = [
+  {
+    key: "left",
+    icon: "gesture-swipe-left",
+    title: "Swipe left",
+    text: "See the next photo",
+    target: { x: -80, y: 0 },
+  },
+  {
+    key: "right",
+    icon: "gesture-swipe-right",
+    title: "Swipe right",
+    text: "See the previous photo",
+    target: { x: 80, y: 0 },
+  },
+];
+const BACK_GUIDE_STEP: SwipeGuideStep = {
+  key: "down",
+  icon: "gesture-swipe-down",
+  title: "Swipe down",
+  text: "Go back to the profiles",
+  target: { x: 0, y: 70 },
+};
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SWIPE_DOWN_DISTANCE = 80;
@@ -43,82 +66,6 @@ const SWIPE_DOWN_VELOCITY = 900;
 const SPRING_BACK = { damping: 18, stiffness: 220 };
 const PHOTO_SWIPE_DISTANCE = 40;
 const PHOTO_SWIPE_VELOCITY = 500;
-
-type FeatherIcon = React.ComponentProps<typeof Feather>["name"];
-
-function Section({
-  title,
-  icon,
-  children,
-  plain,
-}: {
-  title: string;
-  icon: FeatherIcon;
-  children: React.ReactNode;
-  plain?: boolean;
-}) {
-  return (
-    <View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <View style={styles.sectionIcon}>
-          <Feather name={icon} size={14} color={COLORS.primary} />
-        </View>
-        <Text style={styles.sectionTitle}>{title}</Text>
-      </View>
-      {plain ? children : <View style={styles.card}>{children}</View>}
-    </View>
-  );
-}
-
-/** Thisa Iruppu with its balance, e.g. "Jupiter 05 years, 04 months, 04 days". */
-function dasaText(profile: Profile) {
-  const balance = details([
-    ["years", profile.Year],
-    ["months", profile.Month],
-    ["days", profile.Day],
-  ])
-    .map((p) => `${p.value} ${p.label}`)
-    .join(", ");
-  return [clean(profile.ThisaIruppu), balance].filter(Boolean).join(" ");
-}
-
-/** Stacked label/value rows; `grid` lays them out two per line. */
-function InfoRows({
-  items,
-  grid,
-  fullWidth = [],
-}: {
-  items: Detail[];
-  grid?: boolean;
-  fullWidth?: string[];
-}) {
-  if (!items.length) return null;
-  return (
-    <View style={[styles.rows, grid && styles.rowsGrid]}>
-      {items.map((item) => (
-        <View
-          key={item.label}
-          style={[
-            styles.row,
-            grid && !fullWidth.includes(item.label) && styles.rowHalf,
-            grid && fullWidth.includes(item.label) && styles.rowFull,
-          ]}
-        >
-          <Text style={styles.rowLabel}>{item.label}</Text>
-          <Text style={styles.rowValue}>{item.value}</Text>
-        </View>
-      ))}
-    </View>
-  );
-}
-
-function CardSubTitle({ title }: { title: string }) {
-  return (
-    <View style={styles.cardSubHeader}>
-      <Text style={styles.cardSubTitle}>{title}</Text>
-    </View>
-  );
-}
 
 export default function ProfileDetails() {
   const navigation = useNavigation<any>();
@@ -131,6 +78,15 @@ export default function ProfileDetails() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [horoscopeOpen, setHoroscopeOpen] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+  const hasMultiplePhotos = photos.length > 1;
+  const guideSteps = useMemo(
+    () =>
+      hasMultiplePhotos
+        ? [...PHOTO_GUIDE_STEPS, BACK_GUIDE_STEP]
+        : [BACK_GUIDE_STEP],
+    [hasMultiplePhotos],
+  );
   const activePhoto = photos[activeIndex] ?? photos[0];
   const heroHeight = useHeroHeight(activePhoto, SHEET_OVERLAP);
   const scrollY = useSharedValue(0);
@@ -248,12 +204,30 @@ export default function ProfileDetails() {
   }, [profile.id]);
 
   useEffect(() => {
+    AsyncStorage.getItem(DETAILS_GUIDE_SEEN_KEY)
+      .then((seen) => {
+        if (!seen) setShowGuide(true);
+      })
+      .catch(() => setShowGuide(true));
+  }, []);
+
+  function closeGuide() {
+    setShowGuide(false);
+    AsyncStorage.setItem(DETAILS_GUIDE_SEEN_KEY, "1").catch(() => {});
+  }
+
+  useEffect(() => {
     if (paused || photos.length < 2) return;
     const timer = setInterval(() => {
       setActiveIndex((index) => (index + 1) % photos.length);
     }, 3000);
     return () => clearInterval(timer);
   }, [paused, photos.length]);
+
+  function handleDownload() {
+    // TODO: generate the profile PDF directly from this page.
+    Alert.alert("Download", "PDF download will be available soon.");
+  }
 
   function selectPhoto(index: number) {
     setActiveIndex(index);
@@ -289,57 +263,6 @@ export default function ProfileDetails() {
         }),
     [stepPhoto],
   );
-
-  const personal = details([
-    ["Horoscope", profile.Horoscope],
-    ["Koottam", profile.Koottam],
-    ["Kula Theivam", profile.KulaTheivam],
-    ["Height", profile.Height],
-    ["Complexion", profile.Complex],
-    ["D.O.B", profile.dob],
-    ["Birth place", profile.BirthPlace],
-    ["Marital status", profile.MaritalStatus],
-    ["Residential Area", profile.location],
-  ]);
-
-  const education: Detail[] = (
-    [
-      ["Education Course", profile.EducationCourse],
-      ["Education Specification", profile.EducationSpecification],
-      ["Working Category", profile.WorkingCategory],
-      ["Designation", profile.Designation],
-      ["Company Name", profile.CompanyName],
-      ["Monthly Salary/Income", profile.MonthlyIncome],
-      ["Working Place", profile.WorkingPlace],
-      ["Working Country", profile.WorkingCountry],
-    ] as const
-  ).map(([label, value]) => ({ label, value: clean(value) ?? "-" }));
-
-  const family = details([
-    ["Father", profile.FatherName],
-    ["Father's occupation", profile.FatherOccupation],
-    ["Mother", profile.MotherName],
-    ["Mother's occupation", profile.MotherOccupation],
-    ["Siblings", profile.SiblingsCount],
-  ]);
-  const assets = (profile.Property ?? []).map((p) => p.trim()).filter(Boolean);
-  const expectations = details([
-    ["Partner expectation", profile.expectations],
-    ["Abroad", profile.AboardExpectation],
-    ["Note", profile.Note],
-  ]);
-
-  const horoscope = details([
-    ["Type of horoscope", profile.Horoscope],
-    ["Star", profile.Star],
-    ["Rasi", profile.Rashi],
-    ["Laknam", profile.Laknam],
-    ["Thisa Iruppu", dasaText(profile)],
-  ]);
-
-  const hasFamilySection =
-    family.length > 0 || assets.length > 0 || expectations.length > 0;
-  const hasHoroscopeSection = horoscope.length > 0;
 
   return (
     <GestureDetector gesture={swipeDown}>
@@ -417,51 +340,7 @@ export default function ProfileDetails() {
 
             {/* Details sheet */}
             <View style={styles.sheet}>
-              <View style={styles.nameBlock}>
-                <Text style={styles.name}>{profile.name}</Text>
-                <Text style={styles.registerNo}>
-                  Register No:{" "}
-                  <Text style={styles.registerNoValue}>{profile.id}</Text>
-                </Text>
-              </View>
-
-              {personal.length > 0 && (
-                <Section title="Basic details" icon="user">
-                  <InfoRows
-                    items={personal}
-                    grid
-                    fullWidth={["Kula Theivam"]}
-                  />
-                </Section>
-              )}
-
-              <Section title="Education and occupation" icon="briefcase">
-                <InfoRows items={education} />
-              </Section>
-
-              {hasFamilySection && (
-                <Section title="Family and assets" icon="home">
-                  <InfoRows items={family} />
-                  {assets.length > 0 && (
-                    <>
-                      <CardSubTitle title="Assets" />
-                      <Text style={styles.assetsText}>{assets.join(", ")}</Text>
-                    </>
-                  )}
-                  {expectations.length > 0 && (
-                    <>
-                      <CardSubTitle title="Expectations" />
-                      <InfoRows items={expectations} />
-                    </>
-                  )}
-                </Section>
-              )}
-
-              {hasHoroscopeSection && (
-                <Section title="Horoscope" icon="sun">
-                  <InfoRows items={horoscope} />
-                </Section>
-              )}
+              <ProfileInfo profile={profile} />
 
               <Section title="Porutham" icon="heart" plain>
                 <PoruthamPeople profile={profile} />
@@ -473,22 +352,7 @@ export default function ProfileDetails() {
               </Section>
 
               {!!profile.horoscopeImage && (
-                <TouchableOpacity
-                  style={styles.horoscopeBtn}
-                  onPress={() => setHoroscopeOpen(true)}
-                  activeOpacity={0.85}
-                >
-                  <Feather name="book-open" size={18} color={COLORS.primary} />
-                  <Text style={styles.horoscopeBtnText}>
-                    View Full Horoscope
-                  </Text>
-                  <Feather
-                    name="chevron-right"
-                    size={18}
-                    color={COLORS.primary}
-                    style={styles.horoscopeBtnChevron}
-                  />
-                </TouchableOpacity>
+                <HoroscopeButton onPress={() => setHoroscopeOpen(true)} />
               )}
             </View>
           </Animated.ScrollView>
@@ -514,7 +378,7 @@ export default function ProfileDetails() {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.interestBtn}
-            onPress={() => navigation.navigate("DownlodProfile", { profile })}
+            onPress={handleDownload}
             activeOpacity={0.85}
           >
             <Feather name="download" size={18} color={COLORS.red} />
@@ -526,6 +390,13 @@ export default function ProfileDetails() {
           source={profile.horoscopeImage}
           visible={horoscopeOpen}
           onClose={() => setHoroscopeOpen(false)}
+        />
+
+        <SwipeGuideModal
+          visible={showGuide}
+          onClose={closeGuide}
+          title="How to view this profile"
+          steps={guideSteps}
         />
       </Animated.View>
     </GestureDetector>
