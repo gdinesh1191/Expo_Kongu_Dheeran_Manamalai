@@ -1,6 +1,7 @@
 import Attendance from "@/pages/attendance";
 import Chat from "@/pages/chat";
 import DownlodProfile from "@/pages/DownlodProfile";
+import EnquireFormPage from "@/pages/enquireForm";
 import FilterPage from "@/pages/filter";
 import Home from "@/pages/Home";
 import LikedProfiles from "@/pages/LikedProfiles";
@@ -10,6 +11,7 @@ import Network from "@/pages/NetworkScreen";
 import PermissionScreen from "@/pages/PermissionScreen";
 import ProfilePage from "@/pages/profile";
 import ProfileDetails from "@/pages/ProfileDetails";
+import Renewal from "@/pages/renewal";
 import SendOtpPage from "@/pages/sendOtp";
 import TodoPage from "@/pages/todo";
 import VerificationScreen from "@/pages/VerificationScreen";
@@ -59,6 +61,8 @@ export default function MainNavigator() {
       <MainStack.Screen name="Todo" component={TodoPage} />
       <MainStack.Screen name="Attendance" component={Attendance} />
       <MainStack.Screen name="Chat" component={Chat} />
+      <MainStack.Screen name="Renewal" component={Renewal} />
+      <MainStack.Screen name="EnquireForm" component={EnquireFormPage} />
     </MainStack.Navigator>
   );
 }

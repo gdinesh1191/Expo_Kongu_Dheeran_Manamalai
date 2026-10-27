@@ -118,6 +118,13 @@ export default function SidebarModalContent({
               <RemixIcon name="home-4-line" size={22} color="#5C6674" />
               <Text style={styles.menuText}>Home</Text>
             </Pressable> */}
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => handleNavigationClick("Dashboard")}
+            >
+              <RemixIcon name="dashboard-line" size={22} color="#5C6674" />
+              <Text style={styles.menuText}>Dashboard</Text>
+            </Pressable>
             {/* Expense */}
             <Pressable
               style={styles.menuItem}
@@ -142,6 +149,21 @@ export default function SidebarModalContent({
             >
               <RemixIcon name="todo-line" size={22} color="#5C6674" />
               <Text style={styles.menuText}>To-Do</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => handleNavigationClick("Renewal")}
+            >
+              <RemixIcon name="calendar-event-line" size={22} color="#5C6674" />
+              <Text style={styles.menuText}>Renewal</Text>
+            </Pressable>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => handleNavigationClick("DownlodProfile")}
+            >
+              <RemixIcon name="download-2-line" size={22} color="#5C6674" />
+              <Text style={styles.menuText}>DownlodProfile</Text>
             </Pressable>
           </View>
         </ScrollView>

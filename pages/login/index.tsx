@@ -215,6 +215,24 @@ export default function LoginPage() {
               </Text>
             </Pressable>
           </View>
+
+          {/* New registration */}
+          <View style={styles.newHereRow}>
+            <View style={styles.newHereLine} />
+            <Text style={styles.newHereText}>New here?</Text>
+            <View style={styles.newHereLine} />
+          </View>
+          <Pressable
+            onPress={() => {
+              // TODO: navigate to the enquiry / new registration screen
+              navigation.navigate("EnquireForm");
+            }}
+            hitSlop={8}
+          >
+            <Text style={styles.enquireText}>
+              Enquire Now for New Registration
+            </Text>
+          </Pressable>
         </KeyboardAwareScrollView>
       </ImageBackground>
     </View>
@@ -255,7 +273,7 @@ const styles = StyleSheet.create({
     height: 96,
     alignSelf: "center",
     marginBottom: 8,
-    marginTop: 120,
+    marginTop: 40,
   },
 
   title: {
@@ -383,4 +401,21 @@ const styles = StyleSheet.create({
     marginTop: 26,
   },
   secureText: { color: COLORS.secure, fontSize: 14 },
+
+  newHereRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 26,
+  },
+  newHereLine: { flex: 1, height: 1, backgroundColor: COLORS.soft },
+  newHereText: { color: COLORS.soft, fontSize: 14 },
+  enquireText: {
+    color: COLORS.gold,
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 14,
+    fontFamily: Platform.select({ ios: "Georgia", android: "serif" }),
+  },
 });
