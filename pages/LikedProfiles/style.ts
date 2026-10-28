@@ -26,6 +26,30 @@ export const styles = StyleSheet.create({
     color: COLORS.muted,
     marginTop: scaleFont(2),
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: scaleFont(12),
+  },
+  headerText: {
+    flexShrink: 1,
+  },
+  headerActions: {
+    flexDirection: "row",
+    gap: scaleFont(8),
+  },
+  headerBtn: {
+    paddingHorizontal: scaleFont(14),
+    paddingVertical: scaleFont(7),
+    borderRadius: scaleFont(16),
+    backgroundColor: COLORS.primaryLight,
+  },
+  headerBtnText: {
+    fontSize: scaleFont(13),
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
 
   // Grid
   listContent: {
@@ -64,6 +88,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
+    gap: scaleFont(8),
   },
   heartBtn: {
     width: scaleFont(32),
@@ -72,6 +97,31 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
+  },
+  // Drawn as an overlay: toggling a border on the clipping card itself
+  // can leave the photo hidden after deselecting.
+  selectedOutline: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: scaleFont(20),
+    borderWidth: 3,
+    borderColor: COLORS.primary,
+  },
+  checkCircle: {
+    width: scaleFont(28),
+    height: scaleFont(28),
+    borderRadius: scaleFont(14),
+    borderWidth: 2,
+    borderColor: COLORS.white,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkCircleActive: {
+    backgroundColor: COLORS.primary,
   },
   cardInfo: {
     position: "absolute",
@@ -126,5 +176,43 @@ export const styles = StyleSheet.create({
     fontSize: scaleFont(15),
     fontWeight: "700",
     color: COLORS.white,
+  },
+
+  // Selection actions
+  actionBar: {
+    flexDirection: "row",
+    gap: scaleFont(8),
+    paddingHorizontal: scaleFont(16),
+    paddingVertical: scaleFont(12),
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    backgroundColor: COLORS.white,
+  },
+  actionBtn: {
+    flex: 1,
+    height: scaleFont(50),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scaleFont(6),
+  },
+  actionText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+  },
+  cartAction: {
+    borderColor: COLORS.primaryDark,
+  },
+  cartActionText: {
+    color: COLORS.primaryDark,
+  },
+  downloadAction: {
+    borderColor: COLORS.red,
+  },
+  downloadActionText: {
+    color: COLORS.red,
   },
 });

@@ -1,18 +1,17 @@
+import EnquirySuccessModal from "@/components/EnquirySuccessModal";
 import KeyboardAwareScrollView from "@/components/KeyboardAwareScrollView";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import {
-    Alert,
-    Image,
-    ImageBackground,
-    KeyboardTypeOptions,
-    Platform,
-    Pressable,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Image,
+  ImageBackground,
+  KeyboardTypeOptions,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import RemixIcon from "react-native-remix-icon";
 
@@ -34,43 +33,68 @@ const COLORS = {
   errorBorder: "#E53935",
 };
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export default function EnquireFormPage() {
   const navigation = useNavigation<any>();
   const [name, setName] = useState("");
+  const [koottam, setKoottam] = useState("");
+  const [kulaTheivam, setKulaTheivam] = useState("");
+  const [residentialPlace, setResidentialPlace] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [email, setEmail] = useState("");
   const [nameError, setNameError] = useState("");
+  const [koottamError, setKoottamError] = useState("");
+  const [kulaTheivamError, setKulaTheivamError] = useState("");
+  const [residentialPlaceError, setResidentialPlaceError] = useState("");
   const [whatsappError, setWhatsappError] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const [successVisible, setSuccessVisible] = useState(false);
+
+  const resetForm = () => {
+    setName("");
+    setKoottam("");
+    setKulaTheivam("");
+    setResidentialPlace("");
+    setWhatsapp("");
+  };
+
+  const onSuccessOk = () => {
+    setSuccessVisible(false);
+    navigation.reset({ index: 0, routes: [{ name: "Home" }] });
+  };
 
   const onSubmit = () => {
     const nextNameError = !name.trim() ? "Name is required" : "";
+    const nextKoottamError = !koottam.trim() ? "Koottam is required" : "";
+    const nextKulaTheivamError = !kulaTheivam.trim()
+      ? "Kula Theivam is required"
+      : "";
+    const nextResidentialPlaceError = !residentialPlace.trim()
+      ? "Residential place is required"
+      : "";
     const nextWhatsappError = !whatsapp
       ? "Whatsapp number is required"
       : !/^\d{10}$/.test(whatsapp)
         ? "Enter a valid 10-digit number"
         : "";
-    const nextEmailError = !email.trim()
-      ? "Email address is required"
-      : !EMAIL_REGEX.test(email.trim())
-        ? "Enter a valid email address"
-        : "";
     setNameError(nextNameError);
+    setKoottamError(nextKoottamError);
+    setKulaTheivamError(nextKulaTheivamError);
+    setResidentialPlaceError(nextResidentialPlaceError);
     setWhatsappError(nextWhatsappError);
-    setEmailError(nextEmailError);
-    if (nextNameError || nextWhatsappError || nextEmailError) return;
+    if (
+      nextNameError ||
+      nextKoottamError ||
+      nextKulaTheivamError ||
+      nextResidentialPlaceError ||
+      nextWhatsappError
+    )
+      return;
 
-    // TODO: send { name, whatsapp, email } to the enquiry API
-    Alert.alert("Enquiry submitted", "Our team will contact you shortly.", [
-      { text: "OK", onPress: () => navigation.navigate("Login") },
-    ]);
+    // TODO: send { name, koottam, kulaTheivam, residentialPlace, whatsapp } to the enquiry API
+    resetForm();
+    setSuccessVisible(true);
   };
 
   return (
     <View style={styles.root}>
-      <StatusBar backgroundColor="#0B8A3A" barStyle="light-content" />
       <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
         <View style={styles.overlay} />
 
@@ -78,6 +102,7 @@ export default function EnquireFormPage() {
           extraScrollHeight={180}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.scroll}
+          paddingBottom={20}
         >
           {/* Logo */}
           <Image source={LOGO} style={styles.logo} resizeMode="contain" />
@@ -110,6 +135,42 @@ export default function EnquireFormPage() {
           />
 
           <LabeledField
+            label="Koottam"
+            placeholder="Enter your koottam"
+            value={koottam}
+            error={koottamError}
+            onChangeText={(text) => {
+              setKoottam(text);
+              if (koottamError) setKoottamError("");
+            }}
+            autoCapitalize="words"
+          />
+
+          <LabeledField
+            label="Kula Theivam"
+            placeholder="Enter your kula theivam"
+            value={kulaTheivam}
+            error={kulaTheivamError}
+            onChangeText={(text) => {
+              setKulaTheivam(text);
+              if (kulaTheivamError) setKulaTheivamError("");
+            }}
+            autoCapitalize="words"
+          />
+
+          <LabeledField
+            label="Residential Place"
+            placeholder="Enter your residential place"
+            value={residentialPlace}
+            error={residentialPlaceError}
+            onChangeText={(text) => {
+              setResidentialPlace(text);
+              if (residentialPlaceError) setResidentialPlaceError("");
+            }}
+            autoCapitalize="words"
+          />
+
+          <LabeledField
             label="Whatsapp Number"
             placeholder="Enter your whatsapp number"
             value={whatsapp}
@@ -122,34 +183,12 @@ export default function EnquireFormPage() {
             maxLength={10}
           />
 
-          <LabeledField
-            label="Email Address"
-            placeholder="Enter your email address"
-            value={email}
-            error={emailError}
-            onChangeText={(text) => {
-              setEmail(text);
-              if (emailError) setEmailError("");
-            }}
-            keyboardType="email-address"
-          />
-
           <Pressable onPress={onSubmit} style={styles.button}>
             <Text style={styles.buttonText} numberOfLines={1}>
               Submit Enquiry
             </Text>
             <RemixIcon name="arrow-right-line" size={16} color={COLORS.white} />
           </Pressable>
-
-          {/* Secure note */}
-          <View style={styles.secureRow}>
-            <RemixIcon
-              name="shield-check-line"
-              size={20}
-              color={COLORS.secure}
-            />
-            <Text style={styles.secureText}>Secure Data</Text>
-          </View>
 
           <View style={styles.switchRow}>
             <Text style={styles.switchHint}>Already have an account? </Text>
@@ -164,6 +203,8 @@ export default function EnquireFormPage() {
           </View>
         </KeyboardAwareScrollView>
       </ImageBackground>
+
+      <EnquirySuccessModal visible={successVisible} onOk={onSuccessOk} />
     </View>
   );
 }
@@ -235,15 +276,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 28,
-    paddingVertical: 32,
+    // paddingVertical: 32,
   },
 
   logo: {
     width: 96,
     height: 96,
     alignSelf: "center",
-    marginBottom: 8,
-    marginTop: 40,
+    // marginBottom: 8,
+    marginTop: 20,
   },
 
   title: {
@@ -334,13 +375,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
   },
-
-  secureRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: 26,
-  },
-  secureText: { color: COLORS.secure, fontSize: 14 },
 });

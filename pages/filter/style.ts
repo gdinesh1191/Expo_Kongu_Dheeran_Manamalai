@@ -236,15 +236,21 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   sliderLabels: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    height: scaleFont(18),
     marginTop: scaleFont(4),
+    marginHorizontal: THUMB_SIZE / 2,
   },
   sliderLabel: {
+    position: "absolute",
     width: scaleFont(28),
+    marginLeft: -scaleFont(14),
     textAlign: "center",
     fontSize: scaleFont(11),
     color: COLORS.muted,
+  },
+  sliderLabelActive: {
+    fontWeight: "700",
+    color: COLORS.primaryDark,
   },
 
   // Chips
@@ -283,6 +289,34 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: COLORS.muted,
+  },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(8),
+    height: scaleFont(42),
+    marginTop: scaleFont(14),
+    paddingHorizontal: scaleFont(12),
+    borderRadius: scaleFont(12),
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 0,
+    fontSize: scaleFont(14),
+    color: COLORS.text,
+  },
+  emptyText: {
+    marginTop: scaleFont(14),
+    fontSize: scaleFont(13),
+    color: COLORS.muted,
+    textAlign: "center",
+  },
+  groupDivider: {
+    paddingTop: scaleFont(14),
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
   },
   checkGrid: {
     flexDirection: "row",

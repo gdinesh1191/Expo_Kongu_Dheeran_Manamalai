@@ -18,6 +18,8 @@ import {
 } from "react-native-safe-area-context";
 import { AuthProvider } from "./app/AuthContext";
 import MainNavigator from "./app/MainNavigator";
+import { CartProvider } from "./context/CartContext";
+import { DownloadsProvider } from "./context/DownloadsContext";
 import { LikedProfilesProvider } from "./context/LikedProfilesContext";
 
 // You can remove this if you don't need to wait for any assets
@@ -103,9 +105,13 @@ function Root() {
           <View style={{ backgroundColor: "#0B9A0B", height: insets.top }} />
           <StatusBar style="light" />
           <LikedProfilesProvider>
-            <NavigationContainer>
-              <MainNavigator />
-            </NavigationContainer>
+            <CartProvider>
+              <DownloadsProvider>
+                <NavigationContainer>
+                  <MainNavigator />
+                </NavigationContainer>
+              </DownloadsProvider>
+            </CartProvider>
           </LikedProfilesProvider>
           <View style={{ height: insets.bottom }} />
         </View>

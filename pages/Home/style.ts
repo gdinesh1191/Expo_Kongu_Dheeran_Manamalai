@@ -51,7 +51,7 @@ export const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: scaleFont(12),
-    color: COLORS.muted,
+    color: COLORS.red,
   },
   userName: {
     fontSize: scaleFont(17),
@@ -476,5 +476,64 @@ export const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     fontWeight: "700",
     color: COLORS.red,
+  },
+
+  // Login prompt card (guest users)
+  loginCard: {
+    marginHorizontal: scaleFont(8),
+    marginBottom: scaleFont(12),
+    padding: scaleFont(16),
+    borderRadius: scaleFont(18),
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.primaryLight,
+    alignItems: "center",
+    shadowColor: "#1F2A1F",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  loginCardIcon: {
+    width: scaleFont(44),
+    height: scaleFont(44),
+    borderRadius: scaleFont(22),
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loginCardTitle: {
+    marginTop: scaleFont(10),
+    fontSize: scaleFont(17),
+    fontWeight: "700",
+    color: COLORS.primaryDark,
+    textAlign: "center",
+  },
+  loginCardText: {
+    marginTop: scaleFont(6),
+    fontSize: scaleFont(13),
+    lineHeight: scaleFont(19),
+    color: COLORS.muted,
+    textAlign: "center",
+  },
+  loginCardBtn: {
+    marginTop: scaleFont(14),
+    alignSelf: "center",
+    height: scaleFont(42),
+    borderRadius: scaleFont(12),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.red,
+    gap: scaleFont(6),
+    borderWidth: 1,
+    borderColor: COLORS.red,
+    width: "50%",
+  },
+
+  loginCardBtnText: {
+    fontSize: scaleFont(15),
+    fontWeight: "700",
+    color: COLORS.white,
   },
 });

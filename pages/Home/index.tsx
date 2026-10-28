@@ -14,9 +14,10 @@ import {
   RefreshControl,
   Text,
   View,
-  ViewToken
+  ViewToken,
 } from "react-native";
 import FeedPostCard from "./FeedPost";
+import LoginPromptCard from "./LoginPromptCard";
 import { COLORS, styles } from "./style";
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
@@ -75,25 +76,18 @@ export default function Home() {
               {token !== null ? (
                 <Text style={styles.greeting}>Reg No: {MY_PROFILE.id}</Text>
               ) : (
-                <Text style={styles.greeting}>Find Your Perfect Match</Text>
+                <Text style={styles.greeting}>For Kongu By Kongu</Text>
               )}
             </View>
           </View>
           <View style={styles.headerRight}>
-            {token !== null ? (
+            {token !== null && (
               <Pressable style={styles.iconBtn}>
                 <Ionicons
                   name="notifications-outline"
                   size={20}
                   color={COLORS.red}
                 />
-              </Pressable>
-            ) : (
-              <Pressable
-                style={styles.loginBtn}
-                onPress={() => navigation.navigate("Login")}
-              >
-                <Text style={styles.loginText}>Login</Text>
               </Pressable>
             )}
           </View>
@@ -124,6 +118,11 @@ export default function Home() {
             tintColor={COLORS.primary}
           />
         }
+        ListHeaderComponent={
+          token === null ? (
+            <LoginPromptCard onLogin={() => navigation.navigate("Login")} />
+          ) : null
+        }
         ListEmptyComponent={
           <>
             <Ionicons
@@ -146,7 +145,7 @@ export default function Home() {
         )}
       />
 
-      <BottomTabBar active="Home" />
+      <BottomTabBar active="Posts" />
     </View>
   );
 }

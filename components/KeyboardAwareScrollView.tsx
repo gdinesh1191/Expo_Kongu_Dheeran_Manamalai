@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import {
   Keyboard,
   Platform,
@@ -13,15 +19,19 @@ interface Props extends ScrollViewProps {
   paddingBottom?: number;
 }
 
-const KeyboardAwareScrollView = ({
-  children,
-  extraScrollHeight = 100,
-  contentContainerStyle,
-  paddingBottom,
-  onScroll,
-  ...props
-}: Props) => {
+const KeyboardAwareScrollView = forwardRef<ScrollView, Props>(function KeyboardAwareScrollView(
+  {
+    children,
+    extraScrollHeight = 100,
+    contentContainerStyle,
+    paddingBottom,
+    onScroll,
+    ...props
+  },
+  ref,
+) {
   const scrollRef = useRef<ScrollView>(null);
+  useImperativeHandle(ref, () => scrollRef.current as ScrollView);
   const contentRef = useRef<View>(null);
 
   // Current ScrollView scroll position
@@ -289,6 +299,6 @@ const KeyboardAwareScrollView = ({
       </View>
     </ScrollView>
   );
-};
+});
 
 export default KeyboardAwareScrollView;

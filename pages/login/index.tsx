@@ -1,14 +1,14 @@
 import { useAuth } from "@/app/AuthContext";
 import KeyboardAwareScrollView from "@/components/KeyboardAwareScrollView";
 import { checkCredentials, LoginRole } from "@/constants/DummyAuth";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { scaleFont } from "@/constants/ScaleFont";
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import {
   Image,
   ImageBackground,
   Platform,
   Pressable,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -48,8 +48,6 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const route = useRoute<any>();
-  const routeParams = route.params ?? {};
   const onChangeRole = (next: LoginRole) => {
     setRole(next);
     setUsernameError("");
@@ -85,13 +83,12 @@ export default function LoginPage() {
         routes: [{ name: "Attendance", params: { role } }],
       });
     } else {
-      navigation.navigate("SendOtp", { role, route: routeParams.route });
+      navigation.navigate("SendOtp", { role });
     }
   };
 
   return (
     <View style={styles.root}>
-      <StatusBar backgroundColor="#0B8A3A" barStyle="light-content" />
       <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
         <View style={styles.overlay} />
 
@@ -223,15 +220,17 @@ export default function LoginPage() {
             <View style={styles.newHereLine} />
           </View>
           <Pressable
+            style={styles.enquireBtn}
             onPress={() => {
               // TODO: navigate to the enquiry / new registration screen
               navigation.navigate("EnquireForm");
             }}
             hitSlop={8}
           >
-            <Text style={styles.enquireText}>
-              Enquire Now for New Registration
+            <Text style={styles.enquireBtnText}>
+              Click Here to Register Your Profile
             </Text>
+            <RemixIcon name="arrow-right-line" size={16} color={COLORS.gold} />
           </Pressable>
         </KeyboardAwareScrollView>
       </ImageBackground>
@@ -411,11 +410,22 @@ const styles = StyleSheet.create({
   },
   newHereLine: { flex: 1, height: 1, backgroundColor: COLORS.soft },
   newHereText: { color: COLORS.soft, fontSize: 14 },
-  enquireText: {
-    color: COLORS.gold,
-    fontSize: 18,
-    textAlign: "center",
+
+  enquireBtn: {
+    flexDirection: "row",
+    padding: 12,
+    borderRadius: 12,
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 14,
-    fontFamily: Platform.select({ ios: "Georgia", android: "serif" }),
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    gap: 8,
+  },
+  enquireBtnText: {
+    color: COLORS.gold,
+    fontSize: scaleFont(15),
+    fontWeight: "700",
   },
 });

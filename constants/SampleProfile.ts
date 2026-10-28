@@ -52,7 +52,7 @@ export const SAMPLE_PROFILES: Profile[] = [
     EducationCourse: "M.D.S.",
     EducationSpecification: "",
     WorkingCategory: "Not Working",
-    location: "Sankagiri, Nattampalayam",
+    location: "Nattampalayam, Sankagiri",
     Designation: "N/A",
     photos: [
       require("../assets/Images/durga2.png"),
@@ -101,7 +101,7 @@ export const SAMPLE_PROFILES: Profile[] = [
     EducationCourse: "B.E",
     EducationSpecification: "",
     WorkingCategory: "Private Job",
-    location: "Rasipuram, K.K. Valasu",
+    location: "K.K.Valasu, Rasipuram",
     Designation: "Software",
     photos: [
       require("../assets/Images/vidhya2.png"),
@@ -150,7 +150,7 @@ export const SAMPLE_PROFILES: Profile[] = [
     EducationCourse: "M.Sc",
     EducationSpecification: "",
     WorkingCategory: "Private Job",
-    location: "Tiruchengode, Vattur",
+    location: "Vattur, Tiruchengode",
     Designation: "Teacher",
     photos: [
       require("../assets/Images/preetha2.png"),
@@ -249,7 +249,7 @@ export const SAMPLE_PROFILES: Profile[] = [
     EducationCourse: "B.SC., M.Tech",
     EducationSpecification: "",
     WorkingCategory: " Private Job",
-    location: "Rasipuram, Masakkalipatty",
+    location: "Masakkalipatty, Rasipuram",
     Designation: "Software",
     photos: [
       require("../assets/Images/Vinupriya2.png"),

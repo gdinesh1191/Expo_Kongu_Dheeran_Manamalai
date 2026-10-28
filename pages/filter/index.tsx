@@ -2,7 +2,7 @@ import KeyboardAwareScrollView from "@/components/KeyboardAwareScrollView";
 import { scaleFont } from "@/constants/ScaleFont";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -18,9 +18,22 @@ import { COLORS, styles } from "./style";
 
 const HEIGHTS = Array.from({ length: 25 }, (_, i) => {
   const inches = 54 + i;
-  return `${Math.floor(inches / 12)} ft ${inches % 12} in`;
+  return `${Math.floor(inches / 12)}'${inches % 12}"`;
 });
-const AGE_STEPS = ["All", "2", "5", "8", "10+"];
+const AGE_GAP_MAX = 10;
+const AGE_GAP_MARKS = [
+  { value: 0, label: "All" },
+  { value: 2, label: "2" },
+  { value: 5, label: "5" },
+  { value: 8, label: "8" },
+  { value: AGE_GAP_MAX, label: "10+" },
+];
+
+function ageGapLabel(gap: number) {
+  if (gap === 0) return "All";
+  if (gap === AGE_GAP_MAX) return `${AGE_GAP_MAX}+ years`;
+  return `${gap} ${gap === 1 ? "year" : "years"}`;
+}
 const COMPLEXIONS = ["Fair", "Brown"];
 const EDUCATION = [
   "Doctorate",
@@ -95,7 +108,7 @@ const EDUCATION_SPECIALIZATION = [
   "Commerce",
   "English",
 ];
-const WORK_COUNTRY = [
+const COUNTRIES = [
   "India",
   "London (England)",
   "Malaysia",
@@ -221,16 +234,18 @@ const AVOID = [
   "Athamam",
   "Eka Porutham",
   "No Rajju",
-  "Exclude Wishlist",
-  "Exclude Downloaded",
+  "Wishlisted",
+  "Downloaded",
+  "Already Viewed",
 ];
 
 const VISIBLE_OPTIONS = 10;
+const CARD_TOP_GAP = scaleFont(12);
 
 type FilterState = {
   heightFrom: number;
   heightTo: number;
-  ageStep: number;
+  ageGap: number;
   profession: string;
   complexion: string[];
   education: string[];
@@ -239,6 +254,7 @@ type FilterState = {
   work: string[];
   workCountry: string[];
   workPlace: string[];
+  residentialCountry: string[];
   residentialState: string[];
   residentialDistrict: string[];
   residentialTaluk: string[];
@@ -249,13 +265,13 @@ type FilterState = {
 
 type ListKey = Exclude<
   keyof FilterState,
-  "heightFrom" | "heightTo" | "ageStep" | "profession"
+  "heightFrom" | "heightTo" | "ageGap" | "profession"
 >;
 
 const EMPTY: FilterState = {
   heightFrom: 0,
   heightTo: HEIGHTS.length - 1,
-  ageStep: 0,
+  ageGap: 0,
   profession: "",
   complexion: [],
   education: [],
@@ -264,6 +280,7 @@ const EMPTY: FilterState = {
   work: [],
   workCountry: [],
   workPlace: [],
+  residentialCountry: [],
   residentialState: [],
   residentialDistrict: [],
   residentialTaluk: [],
@@ -272,22 +289,8 @@ const EMPTY: FilterState = {
   avoid: [],
 };
 
-const INITIAL: FilterState = {
-  ...EMPTY,
-  heightFrom: 8,
-  heightTo: 17,
-  ageStep: 2,
-  complexion: ["Fair"],
-  education: ["PG", "UG"],
-  work: ["Private Job", "Govt Job"],
-  residentialState: ["Tamilnadu"],
-  residentialDistrict: ["Salem", "Chennai"],
-  abroad: ["Not yet decided"],
-  horoscope: ["Sutham"],
-  avoid: ["No Rajju", "Exclude Downloaded"],
-};
-
 const CHIP_ORDER: ListKey[] = [
+  "residentialCountry",
   "residentialState",
   "residentialDistrict",
   "residentialTaluk",
@@ -313,91 +316,85 @@ type Section = {
   checkboxLabel?: string;
 };
 
-const EDUCATION_WORK_SECTIONS: Section[] = [
-  {
-    key: "education",
-    title: "Education",
-    icon: <Ionicons name="school-outline" size={18} color={COLORS.primary} />,
-    options: EDUCATION,
-    showBadge: true,
-    checkboxLabel: "Education degree",
-  },
-  {
-    key: "educationCourse",
-    title: "Education course",
-    icon: <Feather name="book-open" size={18} color={COLORS.primary} />,
-    options: EDUCATION_COURSE,
-    showBadge: true,
-    checkboxLabel: "Education course",
-  },
-  {
-    key: "educationSpecialization",
-    title: "Education specialization",
-    icon: <Feather name="layers" size={18} color={COLORS.primary} />,
-    options: EDUCATION_SPECIALIZATION,
-    showBadge: true,
-    checkboxLabel: "Education specialization",
-  },
-  {
-    key: "work",
-    title: "Working and business",
-    icon: <Feather name="briefcase" size={18} color={COLORS.primary} />,
-    options: WORK,
-    showBadge: true,
-    checkboxLabel: "Work category",
-  },
-  {
-    key: "workCountry",
-    title: "Work country",
-    icon: <Ionicons name="earth-outline" size={18} color={COLORS.primary} />,
-    options: WORK_COUNTRY,
-    showBadge: true,
-    checkboxLabel: "Work country",
-  },
-  {
-    key: "workPlace",
-    title: "Work place",
-    icon: <Ionicons name="business-outline" size={18} color={COLORS.primary} />,
-    options: WORK_PLACE,
-    showBadge: true,
-    checkboxLabel: "Work place",
-  },
-];
+type SubSection = {
+  key: ListKey;
+  label: string;
+  options: string[];
+};
 
-const OTHER_SECTIONS: Section[] = [
-  {
-    key: "residentialState",
-    title: "Residential state",
-    icon: <Feather name="map" size={18} color={COLORS.primary} />,
-    options: RESIDENTIAL_STATE,
-    showBadge: true,
-    checkboxLabel: "Residential state",
-  },
-  {
-    key: "residentialDistrict",
-    title: "Residential district",
-    icon: <Feather name="map-pin" size={18} color={COLORS.primary} />,
-    options: RESIDENTIAL_DISTRICT,
-    showBadge: true,
-    checkboxLabel: "Residential district",
-  },
-  {
-    key: "residentialTaluk",
-    title: "Residential taluk",
-    icon: <Feather name="navigation" size={18} color={COLORS.primary} />,
-    options: RESIDENTIAL_TALUK,
-    showBadge: true,
-    checkboxLabel: "Residential taluk",
-  },
-  {
-    key: "abroad",
-    title: "Abroad expectation",
-    icon: <Feather name="globe" size={18} color={COLORS.primary} />,
-    options: ABROAD,
-    single: true,
-    showBadge: true,
-  },
-];
+type Group = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  sections: SubSection[];
+};
+
+const EDUCATION_GROUP: Group = {
+  id: "education",
+  title: "Education",
+  icon: <Ionicons name="school-outline" size={18} color={COLORS.primary} />,
+  sections: [
+    { key: "education", label: "Education degree", options: EDUCATION },
+    {
+      key: "educationCourse",
+      label: "Education course",
+      options: EDUCATION_COURSE,
+    },
+    {
+      key: "educationSpecialization",
+      label: "Education specialization",
+      options: EDUCATION_SPECIALIZATION,
+    },
+  ],
+};
+
+const WORK_GROUP: Group = {
+  id: "work",
+  title: "Working/Business",
+  icon: <Feather name="briefcase" size={18} color={COLORS.primary} />,
+  sections: [
+    { key: "work", label: "Work category", options: WORK },
+    { key: "workCountry", label: "Work country", options: COUNTRIES },
+    { key: "workPlace", label: "Work place", options: WORK_PLACE },
+  ],
+};
+
+const RESIDENTIAL_GROUP: Group = {
+  id: "residential",
+  title: "Residential Search",
+  icon: <Feather name="map-pin" size={18} color={COLORS.primary} />,
+  sections: [
+    {
+      key: "residentialCountry",
+      label: "Residential country",
+      options: COUNTRIES,
+    },
+    {
+      key: "residentialState",
+      label: "Residential state",
+      options: RESIDENTIAL_STATE,
+    },
+    {
+      key: "residentialDistrict",
+      label: "Residential district",
+      options: RESIDENTIAL_DISTRICT,
+    },
+    {
+      key: "residentialTaluk",
+      label: "Residential taluk",
+      options: RESIDENTIAL_TALUK,
+    },
+  ],
+};
+
+const ABROAD_SECTION: Section = {
+  key: "abroad",
+  title: "Abroad expectation",
+  icon: <Feather name="globe" size={18} color={COLORS.primary} />,
+  options: ABROAD,
+  single: true,
+  showBadge: true,
+};
 
 const AVOID_SECTION: Section = {
   key: "avoid",
@@ -415,10 +412,41 @@ function sectionSubtitle(values: string[]) {
 export default function FilterPage() {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
-  const [filters, setFilters] = useState<FilterState>(INITIAL);
+  const [filters, setFilters] = useState<FilterState>(EMPTY);
   const [expanded, setExpanded] = useState<string | null>("basic");
   const [picker, setPicker] = useState<"from" | "to" | null>(null);
   const [showAll, setShowAll] = useState<Partial<Record<ListKey, boolean>>>({});
+  const [search, setSearch] = useState<Record<string, string>>({});
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollY = useRef(0);
+  const cardRefs = useRef<Record<string, View | null>>({});
+
+  function scrollCardIntoView(id: string) {
+    const card = cardRefs.current[id];
+    const scroll = scrollRef.current as unknown as View | null;
+    if (!card || !scroll) return;
+    scroll.measureInWindow((_x, scrollTop) => {
+      card.measureInWindow((_cx, cardTop) => {
+        const offset = cardTop - scrollTop;
+        if (offset < CARD_TOP_GAP) {
+          scrollRef.current?.scrollTo({
+            y: Math.max(scrollY.current + offset - CARD_TOP_GAP, 0),
+            animated: true,
+          });
+        }
+      });
+    });
+  }
+
+  function toggleCard(id: string) {
+    if (expanded === id) {
+      setExpanded(null);
+      return;
+    }
+    setExpanded(id);
+    // Wait for the previously open card to collapse before measuring.
+    setTimeout(() => scrollCardIntoView(id), 60);
+  }
 
   function toggle(key: ListKey, value: string, single?: boolean) {
     setFilters((f) => {
@@ -436,10 +464,16 @@ export default function FilterPage() {
   }
 
   function selectAll(key: ListKey, options: string[]) {
-    setFilters((f) => ({
-      ...f,
-      [key]: f[key].length === options.length ? [] : [...options],
-    }));
+    setFilters((f) => {
+      const current = f[key];
+      const allSelected = options.every((o) => current.includes(o));
+      return {
+        ...f,
+        [key]: allSelected
+          ? current.filter((v) => !options.includes(v))
+          : [...current, ...options.filter((o) => !current.includes(o))],
+      };
+    });
   }
 
   function pickHeight(index: number) {
@@ -452,11 +486,23 @@ export default function FilterPage() {
   }
 
   const applied: { id: string; label: string; remove: () => void }[] = [];
-  if (filters.ageStep > 0) {
+  if (filters.ageGap > 0) {
     applied.push({
-      id: "ageStep",
-      label: `Age gap ${AGE_STEPS[filters.ageStep]} yrs`,
-      remove: () => setFilters((f) => ({ ...f, ageStep: 0 })),
+      id: "ageGap",
+      label: `Age gap ${ageGapLabel(filters.ageGap)}`,
+      remove: () => setFilters((f) => ({ ...f, ageGap: 0 })),
+    });
+  }
+  if (filters.heightFrom > 0 || filters.heightTo < HEIGHTS.length - 1) {
+    applied.push({
+      id: "height",
+      label: `${HEIGHTS[filters.heightFrom]} - ${HEIGHTS[filters.heightTo]}`,
+      remove: () =>
+        setFilters((f) => ({
+          ...f,
+          heightFrom: EMPTY.heightFrom,
+          heightTo: EMPTY.heightTo,
+        })),
     });
   }
   CHIP_ORDER.forEach((key) =>
@@ -495,19 +541,26 @@ export default function FilterPage() {
     );
   }
 
-  function renderCheckboxGrid(section: Section) {
+  function renderCheckboxGrid(
+    section: SubSection,
+    divider?: boolean,
+    searching?: boolean,
+  ) {
     const values = filters[section.key];
     const expandedList = showAll[section.key];
-    const hidden = section.options.length - VISIBLE_OPTIONS;
+    const hidden = searching ? 0 : section.options.length - VISIBLE_OPTIONS;
     const options =
       hidden > 0 && !expandedList
         ? section.options.slice(0, VISIBLE_OPTIONS)
         : section.options;
 
     return (
-      <View style={styles.cardBody}>
+      <View
+        key={section.key}
+        style={[styles.cardBody, divider && styles.groupDivider]}
+      >
         <View style={styles.labelRow}>
-          <Text style={styles.groupLabel}>{section.checkboxLabel}</Text>
+          <Text style={styles.groupLabel}>{section.label}</Text>
           <Pressable
             onPress={() => selectAll(section.key, section.options)}
             hitSlop={8}
@@ -558,10 +611,16 @@ export default function FilterPage() {
     const open = expanded === section.key;
     const values = filters[section.key];
     return (
-      <View key={section.key} style={[styles.card, open && styles.cardActive]}>
+      <View
+        key={section.key}
+        ref={(r) => {
+          cardRefs.current[section.key] = r;
+        }}
+        style={[styles.card, open && styles.cardActive]}
+      >
         <Pressable
           style={styles.cardHeader}
-          onPress={() => setExpanded(open ? null : section.key)}
+          onPress={() => toggleCard(section.key)}
         >
           <View style={styles.cardIcon}>{section.icon}</View>
           <View style={styles.cardTitleWrap}>
@@ -583,13 +642,100 @@ export default function FilterPage() {
         </Pressable>
 
         {open && section.checkboxLabel ? (
-          renderCheckboxGrid(section)
+          renderCheckboxGrid({
+            key: section.key,
+            label: section.checkboxLabel,
+            options: section.options,
+          })
         ) : open ? (
           <View style={[styles.cardBody, styles.chipsWrap]}>
             {section.options.map((o) =>
               renderChip(section.key, o, section.single),
             )}
           </View>
+        ) : null}
+      </View>
+    );
+  }
+
+  function renderGroup(group: Group, extra?: React.ReactNode, extraValue = "") {
+    const open = expanded === group.id;
+    const values = group.sections.flatMap((s) => filters[s.key]);
+    if (extraValue) values.push(extraValue);
+    const query = search[group.id] ?? "";
+    const term = query.trim().toLowerCase();
+    const sections = term
+      ? group.sections
+          .map((s) => ({
+            ...s,
+            options: s.options.filter((o) => o.toLowerCase().includes(term)),
+          }))
+          .filter((s) => s.options.length > 0)
+      : group.sections;
+    return (
+      <View
+        key={group.id}
+        ref={(r) => {
+          cardRefs.current[group.id] = r;
+        }}
+        style={[styles.card, open && styles.cardActive]}
+      >
+        <Pressable
+          style={styles.cardHeader}
+          onPress={() => toggleCard(group.id)}
+        >
+          <View style={styles.cardIcon}>{group.icon}</View>
+          <View style={styles.cardTitleWrap}>
+            <Text style={styles.cardTitle}>{group.title}</Text>
+            <Text style={styles.cardSubtitle} numberOfLines={1}>
+              {sectionSubtitle(values)}
+            </Text>
+          </View>
+          {values.length > 0 ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{values.length}</Text>
+            </View>
+          ) : null}
+          <Feather
+            name={open ? "chevron-up" : "chevron-right"}
+            size={18}
+            color={COLORS.text}
+          />
+        </Pressable>
+
+        {open ? (
+          <>
+            <View style={styles.searchBox}>
+              <Feather name="search" size={16} color={COLORS.muted} />
+              <TextInput
+                style={styles.searchInput}
+                value={query}
+                onChangeText={(text) =>
+                  setSearch((s) => ({ ...s, [group.id]: text }))
+                }
+                placeholder={`Search ${group.title.toLowerCase()}`}
+                placeholderTextColor={COLORS.muted}
+                autoCorrect={false}
+                autoCapitalize="none"
+                returnKeyType="search"
+              />
+              {query ? (
+                <Pressable
+                  onPress={() => setSearch((s) => ({ ...s, [group.id]: "" }))}
+                  hitSlop={8}
+                >
+                  <Feather name="x-circle" size={16} color={COLORS.muted} />
+                </Pressable>
+              ) : null}
+            </View>
+            {sections.map((s, i) => renderCheckboxGrid(s, i > 0, !!term))}
+            {term && sections.length === 0 ? (
+              <Text style={styles.emptyText}>
+                No results for &quot;{query.trim()}&quot;
+              </Text>
+            ) : null}
+            {extra}
+          </>
         ) : null}
       </View>
     );
@@ -634,6 +780,10 @@ export default function FilterPage() {
       ) : null}
 
       <KeyboardAwareScrollView
+        ref={scrollRef}
+        onScroll={(e) => {
+          scrollY.current = e.nativeEvent.contentOffset.y;
+        }}
         contentContainerStyle={styles.scrollContent}
         paddingBottom={scaleFont(16)}
       >
@@ -654,10 +804,15 @@ export default function FilterPage() {
 
           {renderSection(AVOID_SECTION)}
 
-          <View style={[styles.card, basicOpen && styles.cardActive]}>
+          <View
+            ref={(r) => {
+              cardRefs.current.basic = r;
+            }}
+            style={[styles.card, basicOpen && styles.cardActive]}
+          >
             <Pressable
               style={styles.cardHeader}
-              onPress={() => setExpanded(basicOpen ? null : "basic")}
+              onPress={() => toggleCard("basic")}
             >
               <View style={styles.cardIcon}>
                 <Feather name="user" size={18} color={COLORS.primary} />
@@ -674,7 +829,24 @@ export default function FilterPage() {
 
             {basicOpen ? (
               <View style={styles.cardBody}>
-                <Text style={styles.label}>Height range</Text>
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>Age difference upto</Text>
+                  <View style={styles.valuePill}>
+                    <Text style={styles.valuePillText}>
+                      {ageGapLabel(filters.ageGap)}
+                    </Text>
+                  </View>
+                </View>
+                <ValueSlider
+                  max={AGE_GAP_MAX}
+                  marks={AGE_GAP_MARKS}
+                  value={filters.ageGap}
+                  onChange={(ageGap) => setFilters((f) => ({ ...f, ageGap }))}
+                />
+
+                <Text style={[styles.label, styles.fieldGap]}>
+                  Height range
+                </Text>
                 <View style={styles.rangeRow}>
                   <HeightDropdown
                     value={HEIGHTS[filters.heightFrom]}
@@ -686,22 +858,6 @@ export default function FilterPage() {
                     onPress={() => setPicker("to")}
                   />
                 </View>
-
-                <View style={[styles.labelRow, styles.fieldGap]}>
-                  <Text style={styles.label}>Age difference upto</Text>
-                  <View style={styles.valuePill}>
-                    <Text style={styles.valuePillText}>
-                      {filters.ageStep === 0
-                        ? "All"
-                        : `${AGE_STEPS[filters.ageStep]} years`}
-                    </Text>
-                  </View>
-                </View>
-                <StepSlider
-                  steps={AGE_STEPS}
-                  value={filters.ageStep}
-                  onChange={(ageStep) => setFilters((f) => ({ ...f, ageStep }))}
-                />
 
                 <View style={[styles.labelRow, styles.fieldGap]}>
                   <Text style={styles.label}>Complexion</Text>
@@ -719,36 +875,29 @@ export default function FilterPage() {
             ) : null}
           </View>
 
-          {EDUCATION_WORK_SECTIONS.map(renderSection)}
+          {renderGroup(EDUCATION_GROUP)}
 
-          <View
-            style={[
-              styles.card,
-              expanded === "profession" && styles.cardActive,
-            ]}
-          >
-            <View style={styles.cardHeader}>
-              <View style={styles.cardIcon}>
-                <Feather name="award" size={18} color={COLORS.primary} />
-              </View>
-              <View style={styles.cardTitleWrap}>
-                <Text style={styles.cardTitle}>Profession</Text>
-              </View>
-            </View>
-            <TextInput
-              style={styles.textInput}
-              value={filters.profession}
-              onChangeText={(profession) =>
-                setFilters((f) => ({ ...f, profession }))
-              }
-              onFocus={() => setExpanded("profession")}
-              placeholder="e.g. Software Engineer"
-              placeholderTextColor={COLORS.muted}
-              returnKeyType="done"
-            />
-          </View>
+          {renderGroup(
+            WORK_GROUP,
+            <View style={[styles.cardBody, styles.groupDivider]}>
+              <Text style={styles.groupLabel}>Profession</Text>
+              <TextInput
+                style={styles.textInput}
+                value={filters.profession}
+                onChangeText={(profession) =>
+                  setFilters((f) => ({ ...f, profession }))
+                }
+                placeholder="e.g. Software Engineer"
+                placeholderTextColor={COLORS.muted}
+                returnKeyType="done"
+              />
+            </View>,
+            profession,
+          )}
 
-          {OTHER_SECTIONS.map(renderSection)}
+          {renderGroup(RESIDENTIAL_GROUP)}
+
+          {renderSection(ABROAD_SECTION)}
         </View>
       </KeyboardAwareScrollView>
 
@@ -840,35 +989,39 @@ function HeightDropdown({
   );
 }
 
-function StepSlider({
-  steps,
+function ValueSlider({
+  max,
+  marks,
   value,
   onChange,
 }: {
-  steps: string[];
+  max: number;
+  marks: { value: number; label: string }[];
   value: number;
-  onChange: (step: number) => void;
+  onChange: (value: number) => void;
 }) {
   const [width, setWidth] = useState(0);
-  const last = steps.length - 1;
 
   function update(x: number) {
     if (!width) return;
     const ratio = Math.min(Math.max(x / width, 0), 1);
-    const step = Math.round(ratio * last);
-    if (step !== value) onChange(step);
+    const next = Math.round(ratio * max);
+    if (next !== value) onChange(next);
   }
 
   const pan = Gesture.Pan()
     .runOnJS(true)
+    .hitSlop({ vertical: 12 })
     .activeOffsetX([-4, 4])
     .failOffsetY([-12, 12])
+    .onStart((e) => update(e.x))
     .onUpdate((e) => update(e.x));
   const tap = Gesture.Tap()
     .runOnJS(true)
+    .hitSlop({ vertical: 12 })
     .onEnd((e) => update(e.x));
 
-  const left = width * (value / last);
+  const left = width * (value / max);
 
   return (
     <View>
@@ -883,9 +1036,18 @@ function StepSlider({
         </View>
       </GestureDetector>
       <View style={styles.sliderLabels}>
-        {steps.map((s) => (
-          <Text key={s} style={styles.sliderLabel}>
-            {s}
+        {marks.map((m) => (
+          <Text
+            key={m.label}
+            style={[
+              styles.sliderLabel,
+              { left: width * (m.value / max) },
+              m.value === value && styles.sliderLabelActive,
+            ]}
+            onPress={() => onChange(m.value)}
+            suppressHighlighting
+          >
+            {m.label}
           </Text>
         ))}
       </View>

@@ -20,7 +20,7 @@ export default function LogoutModal({ visible, onCancel }: Props) {
     setTimeout(() => {
       navigation.reset({
         index: 0,
-        routes: [{ name: "Login" }],
+        routes: [{ name: "Home" }],
       });
     }, 500);
   };

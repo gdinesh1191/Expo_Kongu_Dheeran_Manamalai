@@ -6,7 +6,6 @@ export { COLORS };
 
 const HERO_HEIGHT = Dimensions.get("window").height * 0.42;
 export const SHEET_OVERLAP = scaleFont(26);
-
 const CANVAS = "#F4F6F4";
 const CARD_SHADOW = {
   shadowColor: "#000",
@@ -249,15 +248,52 @@ export const styles = StyleSheet.create({
 
   // Footer
   footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: scaleFont(12),
-    paddingHorizontal: scaleFont(16),
+    gap: scaleFont(8),
+    paddingHorizontal: scaleFont(10),
     paddingTop: scaleFont(12),
     paddingBottom: scaleFont(16),
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
     backgroundColor: COLORS.white,
+  },
+  footerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scaleFont(6),
+  },
+  pdfBtn: {
+    flex: 1,
+    height: scaleFont(50),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scaleFont(6),
+  },
+  pdfText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+  deleteBtn: {
+    flex: 1,
+    height: scaleFont(50),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    borderColor: COLORS.red,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scaleFont(6),
+  },
+  deleteText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: COLORS.red,
   },
   wishlistBtn: {
     flex: 1,
@@ -269,14 +305,17 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: scaleFont(6),
-    paddingHorizontal: scaleFont(8),
+    gap: scaleFont(4),
+    paddingHorizontal: scaleFont(4),
   },
   wishlistBtnActive: {
     backgroundColor: COLORS.primary,
   },
   wishlistText: {
+    flexShrink: 1,
+    textAlign: "center",
     fontSize: scaleFont(14),
+    lineHeight: scaleFont(17),
     fontWeight: "700",
     color: COLORS.primary,
   },
@@ -293,12 +332,34 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: scaleFont(6),
-    paddingHorizontal: scaleFont(8),
+    gap: scaleFont(4),
+    paddingHorizontal: scaleFont(4),
   },
   interestText: {
+    flexShrink: 1,
     fontSize: scaleFont(14),
     fontWeight: "700",
     color: COLORS.red,
+  },
+  cartBtn: {
+    flex: 1,
+    height: scaleFont(50),
+    borderRadius: scaleFont(12),
+    borderWidth: 1.5,
+    borderColor: COLORS.primaryDark,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scaleFont(4),
+    paddingHorizontal: scaleFont(4),
+  },
+  cartText: {
+    flexShrink: 1,
+    textAlign: "center",
+    fontSize: scaleFont(14),
+    lineHeight: scaleFont(17),
+    fontWeight: "700",
+    color: COLORS.primaryDark,
   },
 });

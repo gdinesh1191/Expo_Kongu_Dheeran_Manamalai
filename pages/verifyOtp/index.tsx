@@ -12,7 +12,6 @@ export default function VerifyOtpPage() {
   const route = useRoute<any>();
   const { login } = useAuth();
   const masked = route.params?.masked ?? "*****0467";
-  const Route = route.params?.route ?? "Home";
   const inputs = useRef<Array<TextInput | null>>([]);
   const [digits, setDigits] = useState<string[]>(Array(LENGTH).fill(""));
   const [error, setError] = useState("");
@@ -65,7 +64,7 @@ export default function VerifyOtpPage() {
     login("user");
     navigation.reset({
       index: 0,
-      routes: [{ name: Route, params: { role: "user" } }],
+      routes: [{ name: "Profile", params: { role: "user" } }],
     });
   };
 

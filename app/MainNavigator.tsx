@@ -1,6 +1,8 @@
 import Attendance from "@/pages/attendance";
+import Cart from "@/pages/cart";
 import Chat from "@/pages/chat";
 import DownlodProfile from "@/pages/DownlodProfile";
+import Downloads from "@/pages/downloads";
 import EnquireFormPage from "@/pages/enquireForm";
 import FilterPage from "@/pages/filter";
 import Home from "@/pages/Home";
@@ -35,7 +37,9 @@ export default function MainNavigator() {
   return (
     <MainStack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName={token === "staff" ? "Attendance" : "Home"}
+      initialRouteName={
+        token === "staff" ? "Attendance" : token === "user" ? "Profile" : "Home"
+      }
     >
       <MainStack.Screen
         name="VerificationScreen"
@@ -55,6 +59,8 @@ export default function MainNavigator() {
       />
       <MainStack.Screen name="MyProfile" component={MyProfile} />
       <MainStack.Screen name="LikedProfiles" component={LikedProfiles} />
+      <MainStack.Screen name="Cart" component={Cart} />
+      <MainStack.Screen name="MyDownloads" component={Downloads} />
       <MainStack.Screen name="Login" component={LoginPage} />
       <MainStack.Screen name="SendOtp" component={SendOtpPage} />
       <MainStack.Screen name="VerifyOtp" component={VerifyOtpPage} />

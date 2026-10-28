@@ -15,7 +15,6 @@ export default function SendOtpPage() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const role = route.params?.role ?? "user";
-  const Route = route.params?.route ?? "Home";
   const [channel, setChannel] = useState<Channel>("phone");
 
   const onSend = () => {
@@ -23,7 +22,6 @@ export default function SendOtpPage() {
       channel,
       masked: CONTACTS[channel],
       role,
-      route: Route,
     });
   };
 
